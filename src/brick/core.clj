@@ -1,36 +1,29 @@
 (ns brick.core
   (:use [quil.core])
-  (:require [brick.tile :as tile])
+  (:require [brick.tile :as tile]
+            [brick.layer :as layer])
+  (:import [brick.layer GridLayer])
   (:gen-class))
 
-(defn setup []
+(defn setup [tiles-atom]
+  (tile/load-tiles tiles-atom (load-image "resources/tiles2.png") 32)
   (smooth)
   (frame-rate 1)
-  (background 255)
-  (def tiles
-    ((tile/load-tiles (load-image "resources/tiles2.png") 32)
-     {:bricks 1
-      :grass 2
-      :bush 4})))
+  (background 255))
 
-(defn draw-grid []
-  (doall
-   (for [x (range 10)
-         y (range 10)]
-     (image (tiles
-             (if (odd? (+ x y))
-               :grass
-               :bricks)) (* x 32) (* y 32))))
-  (with-translation [10 10] (image (tiles :bush) (* 32 (rand-int 10)) (* 32 (rand-int 10)))))
-
-(defn draw-layer
-)
+(defn draw [tiles-atom]
+  (.draw
+   (background 0)
+   (text (str "aoeu" (first @tiles-atom)) 20 20)
+   (comment (layer/init-grid-layer 3 3
+                                   (fn [x y]
+                                     (fn [h w]
+                                       (image (@tiles-atom 1) 0 0 h w)))))))
 
 (defn start []
-  (defsketch example
-    :title "Tiles!"
-    :setup setup
-    :draw (var draw-grid)))
-
-(defn -main []
-)
+  (let [tiles (atom [])]
+    (defsketch example
+      :title "Tiles!"
+      :setup #(setup tiles)
+      :draw #((var draw) tiles)
+      :size [320 320])))

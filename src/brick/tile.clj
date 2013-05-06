@@ -4,15 +4,13 @@
 (defn load-tiles
   "Return a function that given a keyword index map, returns a keyword
   p-image map"
-  [tile-map-image tile-width]
-  (let [num-tiles (/ (.width tile-map-image) tile-width)
-        indexed-tiles
-        (for [i (take num-tiles
-                      (iterate (partial + tile-width) 0))]
-          (.get tile-map-image i 0 tile-width tile-width))]
-    (fn [key-index-map]
-      (reduce merge
-              (for [[k v] key-index-map
-                    :let [tile ((vec indexed-tiles) v)]
-                    :when tile]
-                {k tile})))))
+  ([source-image tile-width]
+     (load-tiles (atom []) source-image tile-width))
+  ([tiles source-image tile-width]
+     (swap! tiles concat
+            (let [n-tiles (/ (.width source-image) tile-width)
+                  indexed-tiles (doall
+                                 (for
+                                     [i (take n-tiles
+                                              (iterate (partial + tile-width) 0))]
+                                   (.get source-image i 0 tile-width tile-width)))]))))
