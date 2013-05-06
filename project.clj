@@ -3,5 +3,6 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [quil "1.6.0"]]
   :resource-paths ["resources/"]
-  :profiles {:dev {:dependencies [[midje "1.5.0"]]}})
+  :profiles {:dev {:dependencies [[midje "1.5.0"]]}}
+  :main brick.core)
   
