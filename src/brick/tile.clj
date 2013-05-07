@@ -7,15 +7,16 @@
   ([source-image tile-width]
      (load-tiles (atom []) source-image tile-width))
   ([tiles source-image tile-width]
-     (swap! tiles
-            (fn [existing]
-              (concat existing 
-                     (let [n-tiles (/ (.width source-image) tile-width)
-                           indexed-tiles
-                           (for
-                               [i (take n-tiles
-                                        (iterate (partial + tile-width) 0))]
-                             (.get source-image i 0 tile-width tile-width))]
-                       (vec indexed-tiles)))))))
+     (let [n-tiles (/ (.width source-image) tile-width)
+           indexed-tiles
+           (for
+               [i (take n-tiles
+                        (iterate (partial + tile-width) 0))]
+             (fn [h w]
+               (image
+                (.get source-image i 0 tile-width tile-width)
+                      0 0
+                      h w)))]
+       (vec indexed-tiles))))
 
 

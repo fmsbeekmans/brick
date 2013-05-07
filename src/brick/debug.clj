@@ -1,0 +1,32 @@
+(ns brick.debug
+  (:use [quil.core]))
+
+(defprotocol HUDDebug
+  (toggle [_])
+  (add-line [_ text dereffable])
+  (remove-line [_ dereffable])
+  (draw [_]))
+
+(defn fps-dbg []
+  (let [visible? (atom false)
+        lines (atom {})]
+    (reify HUDDebug
+      (toggle [_]
+        (swap! visible? not))
+      (add-line [_ text dereffable]
+        (swap! lines #(assoc % dereffable text)))
+      (remove-line [_ dereffable]
+        (swap! lines #(dissoc % dereffable)))
+      (draw [_]
+        (if @visible?
+          (do
+            (push-style)
+            (doall (map
+                    (fn [[d t] i]
+                      (fill 90 170)
+                      (stroke 0)
+                      (rect 20 (+ 5 (* 20 i)) 300 20 )
+                      (fill 255)
+                      (text (str t ": " @d) 20 (+ 20 (* 20 i))))
+                    @lines (iterate inc 0)))
+            (pop-style)))))))
