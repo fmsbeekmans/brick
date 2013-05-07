@@ -6,25 +6,23 @@
   (:import [brick.layer GridLayer]))
 
 (defn setup [tiles-atom]
-  (smooth))
+    (swap! tiles-atom
+         (fn [tiles]
+           (concat tiles
+                   (tile/load-tiles
+                    (load-image "resources/tiles2.png") 32))))
+    (smooth))
 
 (def t (atom 0))
 
 (defn draw [tiles-atom]
-  (swap! tiles-atom
-         (fn [tiles]
-           (concat
-            (tile/load-tiles
-             (load-image "resources/tiles2.png") 32))))
-  (spit "resources/log" (count @tiles-atom))
-  
-  (frame-rate 60)
-  (with-translation [(/ (width) 2) (/ (height) 2) ]
-    (with-rotation [@t]
-      (with-translation [(+ 10 @t) 0]
-        (spit "src/brick/log" @tiles-atom)
-        ((nth @tiles-atom 7) @t @t))))
-  (swap! t inc))
+  (tile/with-tiles (vec @tiles-atom)
+      (tile/with-dictionary {:a 0
+                             :b 1
+                             :c 2}
+        (with-translation [100 100]
+          (background 0)
+          ((tile/tile :b) 20 20)))))
 
 
 (defn start []
