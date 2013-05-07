@@ -15,7 +15,7 @@
         (swap! visible? not))
       (add-line [_ text derefable]
         (swap! lines #(assoc % derefable text)))
-      (remove-line [_ dereffable]
+      (remove-line [_ derefable]
         (swap! lines #(dissoc % derefable)))
       (draw [_]
         (if @visible?
