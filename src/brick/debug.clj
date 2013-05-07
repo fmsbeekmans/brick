@@ -7,7 +7,7 @@
   (remove-line [_ derefable])
   (draw [_]))
 
-(defn fps-dbg []
+(defn simple-dbg []
   (let [visible? (atom false)
         lines (atom {})]
     (reify HUDDebug
