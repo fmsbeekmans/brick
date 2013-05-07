@@ -1,24 +1,26 @@
 (ns brick.core
   (:use [quil.core])
   (:require [brick.tile :as tile]
-            [brick.layer :as layer])
+            [brick.layer :as layer]
+            [clojure.java.io :as io])
   (:import [brick.layer GridLayer])
   (:gen-class))
 
 (defn setup [tiles-atom]
-  (tile/load-tiles tiles-atom (load-image "resources/tiles2.png") 32)
-  (smooth)
-  (frame-rate 1)
-  (background 255))
+  (smooth))
+
+(def t (atom 0))
+
+(def arghatom nil)
 
 (defn draw [tiles-atom]
-  (.draw
-   (background 0)
-   (text (str "aoeu" (first @tiles-atom)) 20 20)
-   (comment (layer/init-grid-layer 3 3
-                                   (fn [x y]
-                                     (fn [h w]
-                                       (image (@tiles-atom 1) 0 0 h w)))))))
+  (frame-rate 10)
+  (tile/load)
+  (with-translation [(/ (width) 2) (/ (height) 2) ]
+    (with-rotation [@t]
+      (with-translation [(+ 10 @t) 0]
+        (image (nth @tiles-atom 7) 0 0 @t @t))))
+  (swap! t inc))
 
 (defn start []
   (let [tiles (atom [])]
