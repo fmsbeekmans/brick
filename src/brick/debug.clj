@@ -3,8 +3,8 @@
 
 (defprotocol HUDDebug
   (toggle [_])
-  (add-line [_ text dereffable])
-  (remove-line [_ dereffable])
+  (add-line [_ text derefable])
+  (remove-line [_ derefable])
   (draw [_]))
 
 (defn fps-dbg []
@@ -13,10 +13,10 @@
     (reify HUDDebug
       (toggle [_]
         (swap! visible? not))
-      (add-line [_ text dereffable]
-        (swap! lines #(assoc % dereffable text)))
+      (add-line [_ text derefable]
+        (swap! lines #(assoc % derefable text)))
       (remove-line [_ dereffable]
-        (swap! lines #(dissoc % dereffable)))
+        (swap! lines #(dissoc % derefable)))
       (draw [_]
         (if @visible?
           (do
