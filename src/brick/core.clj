@@ -20,26 +20,13 @@
 (defn defbrick
   "Create a new brick"
   [sym & opts]
-  {:pre [(not (active?))]}
   (println opts)
   (binding [bricklett (apply hash-map opts)]
     (defsketch sym
       :setup (:setup bricklett)
       :title (:title bricklett)
-      :draw (:update bricklett)
+      :draw update!
       :size (:size bricklett))))
-
-(defn start!
-  "Launch a test application"
-  []
-  (brick-load
-   :title "Tyler"
-   :size [640 320]
-   :setup #()
-   :tiles (atom [])
-   :init-tiles #()
-   :layers (atom [])
-   :draw #()))
 
 (defn- init-tiles!
   "initialize tiles"
@@ -51,12 +38,12 @@
                    (tile/load-tiles
                     (load-image "resources/tiles2.png") 32)))))
 
-(defn- setup!
+(defn- setup
   "Prepare the engine"
   []
   {:pre [(active?)]}
   (smooth)
-  (init-tiles!))
+  (swap! (tiles) (init-tiles!)))
 
 (defn title
   "The title of the running application"
@@ -103,3 +90,13 @@
   "Start a brick application"
   [& args]
   `(defbrick '~(symbol (:title (apply hash-map args))) ~@args))
+
+(defn start!
+  "Launch a test application"
+  []
+  (brick-load
+   :title "Tyler"
+   :size [640 320]
+   :tiles (atom [])
+   :setup #()
+   :layers (atom [])))
