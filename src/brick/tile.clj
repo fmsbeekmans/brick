@@ -22,6 +22,7 @@
 (defn tile
   "Return a tile from the tiles given by it's path in the dictionary."
   [& path]
+  {:pre [()]}
   (tiles (get-in dictionary path)))
 
 (defmacro with-tiles [local-tiles & body]
@@ -33,3 +34,10 @@
   "Execute the body using a tile dictionary."
   `(binding [dictionary ~local-dictionary]
      (do ~@body)))
+
+(defn image-tile
+  [& path]
+  (fn [w h]
+    (image (get-in dictionary path)
+           0 0
+           w h)))
