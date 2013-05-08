@@ -7,6 +7,7 @@
 
 (declare brick-load)
 (declare update!)
+(declare setup)
 
 (def
   #^{:doc "The current application"
@@ -21,13 +22,15 @@
 (defn defbrick
   "Create a new brick"
   [sym & opts]
-  (println opts)
-  (binding [bricklett (apply hash-map opts)]
-    (defsketch sym
-      :setup (:setup bricklett)
-      :title (:title bricklett)
-      :draw update!
-      :size (:size bricklett))))
+  (let [dbg (debug/simple-dbg)]
+    (binding [bricklett (apply hash-map opts)]
+      (defsketch sym
+        :setup (fn []
+                 (debug/toggle dbg)
+                 (debug/add-line dbg "init-args" (atom (apply hash-map opts))))
+        :title (:title bricklett)
+        :draw #(debug/draw dbg)
+        :size (:size bricklett)))))
 
 (defn- init-tiles!
   "initialize tiles"
@@ -39,11 +42,11 @@
                    (tile/load-tiles
                     (load-image "resources/tiles2.png") 32)))))
 
-(defn- setup
+(defn setup
   "Prepare the engine"
   []
   {:pre [(active?)]}
-  (smooth))
+  (background 0))
 
 (defn title
   "The title of the running application"
@@ -73,18 +76,21 @@
   "Actually render the layers."
   []
   {:pre [(active?)]}
-  (tile/with-tiles (vec @(:tiles bricklett))
-    (map (fn [layer]
-           (tile/with-dictionary (:dictionary layer)
-             (.draw layer)))
-         layers)))
+
+  (comment
+    (tile/with-tiles (vec @(:tiles bricklett))
+      (map (fn [layer]
+             (tile/with-dictionary (:dictionary layer)
+               (.draw layer)))
+           layers))))
 
 (defn- update!
   "Clock tick"
   []
   {:pre [(active?)]}
   (render!)
-  (map #(.update %) (:layers bricklett)))
+  ;(map #(.update %) (:layers bricklett))
+  )
 
 (defmacro brick-load
   "Start a brick application"
@@ -98,5 +104,4 @@
    :title "Tyler"
    :size [640 320]
    :tiles (atom [])
-   :setup #()
-   :layers (atom [])))
+   :layers (atom "aoe")))
