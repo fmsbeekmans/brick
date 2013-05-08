@@ -34,8 +34,8 @@
       :title (:title bricklett)
       :draw #(binding [bricklett bricklett]
                (update!)
-               (.draw (first @(layers))))
-      :size (:size bricklett))))
+;               (.draw (first @(layers)))
+      :size (:size bricklett)))))
 
 (defn- init-tiles!
   "initialize tiles"
@@ -82,14 +82,9 @@
   []
   {:pre [(active?)]}
   (tile/with-tiles (vec @(tiles))
-    (background 0)
-    (frame-rate 10)
-    (text (pr-str @(:layers bricklett)) 10 20)
-    (map (fn [layer]
-           (tile/with-dictionary (:dictionary layer)
-             (.draw layer)
-           ))
-         @(layers))))
+    (doseq [layer @(layers)]
+      (tile/with-dictionary (:dictionary layer)
+        (.draw layer)))))
 
 (defn- update!
   "Clock tick"
@@ -112,7 +107,7 @@
    :size [1920 1080]
    :tiles (atom [])
    :layers (atom [(layer/init-grid-layer
-                   96 54 (fn [x y]
+                   5 1 (fn [x y]
                            (fn [h w]
                              (fill 40)
                              (if (odd? (+ x y))
@@ -123,7 +118,8 @@
                   (layer/init-grid-layer
                    3 5 (fn [x y]
                          (fn [h w]
-                           (if (odd? (+ x y))
-                             (fill 255 0 0)
+                           (when (odd? (+ x y))
+                             (stroke 255 0 0)
+                             (fill 200)
                              (rect 0 0 h w))))
                    nil)])))
