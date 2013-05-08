@@ -48,5 +48,4 @@
 (defn set-tile
   "Change tile [x y]"
   [layer [x y] tile]
-  {:pre [brick.bricklett]}
   (assoc (:tiles layer) [x y] tile))

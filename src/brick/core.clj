@@ -22,10 +22,15 @@
    (atom [])
    (atom []) nil))
 
+(defn active?
+  "Is there a running ap?"
+  []
+  bricklett)
+
 (defn- setup
   "Prepare the engine"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (swap! (:tiles bricklett)
          (fn [tiles]
            (concat tiles
@@ -37,37 +42,37 @@
 
   "The title of the running application"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (:title bricklett))
 
 (defn size
   "The size of the running application"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (:size bricklett))
 
 (defn layers
   "The layers the engine will render"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (:layers bricklett))
 
 (defn tiles
   "The tiles the game tile layers can use"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (:tiles bricklett))
 
 (defn- render
 ;  "Actually render the layers."
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (map #(.draw %) (layers)))
 
 (defn- update
   "Clock tick"
   []
-  {:pre [bricklett]}
+  {:pre [(active?)]}
   (tile/with-tiles (vec @(:tiles bricklett))
     (tile/with-dictionary {:paths {:road 0
                                    :canal 3

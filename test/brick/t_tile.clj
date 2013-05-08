@@ -2,7 +2,7 @@
   (:use midje.sweet)
   (:use [brick.core]))
 
-(fact "load tiles correctly"
+(fact :gui "load tiles correctly"
       ; number of tiles
       ; edge rounding?
       ; samples
@@ -13,14 +13,14 @@
       ; nested binding
       )
 
-(fact "with-dictionary binds dictionary correctly"
+(fact :gui "with-dictionary binds dictionary correctly"
       ; binding
       ; nested binding
       )
 
-(fact "tile fuction returns correct tile"
+(fact :gui "tile fuction returns correct tile"
       ; binding
       ; nested binding
       )
 
-(fact "Image tile creates a tile drawer.")
+(fact :gui "image-tile creates the correct tile drawer.")
