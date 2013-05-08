@@ -22,15 +22,17 @@
 (defn defbrick
   "Create a new brick"
   [sym & opts]
-  (let [dbg (debug/simple-dbg)]
-    (binding [bricklett (apply hash-map opts)]
-      (defsketch sym
-        :setup (fn []
+  (let [dbg (debug/simple-dbg)
+        bricklett (apply hash-map opts)]
+    (defsketch sym
+      :setup (fn []
+               (binding [bricklett bricklett]
                  (debug/toggle dbg)
-                 (debug/add-line dbg "init-args" (atom (apply hash-map opts))))
-        :title (:title bricklett)
-        :draw #(debug/draw dbg)
-        :size (:size bricklett)))))
+                 (debug/add-line dbg "init-args" (atom bricklett))))
+      :title (:title bricklett)
+      :draw #(binding [bricklett bricklett]
+               (debug/draw dbg))
+      :size (:size bricklett))))
 
 (defn- init-tiles!
   "initialize tiles"
