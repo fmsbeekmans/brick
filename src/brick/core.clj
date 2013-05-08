@@ -6,6 +6,7 @@
   (:import [brick.layer GridLayer]))
 
 (declare brick-load)
+(declare update!)
 
 (def
   #^{:doc "The current application"
@@ -42,8 +43,7 @@
   "Prepare the engine"
   []
   {:pre [(active?)]}
-  (smooth)
-  (swap! (tiles) (init-tiles!)))
+  (smooth))
 
 (defn title
   "The title of the running application"
