@@ -3,30 +3,22 @@
 
 (defprotocol Layer
   "A layer that can be drawn in a bricklett."
-  (draw [_ _])
+  (draw [_])
   (update [_]))
 
 (defrecord GridLayer
 ; "A Layer that consists of a h times w grid of tiles"
   [h w tiles dictionary update cache?]
   Layer
-  (draw [this cache]
-    (if (not (cache? this))
-      (do
-        (let [tile-h (/ (height) (:h this))
-              tile-w (/ (width) (:w this))]
-          (doall
-           (for [x (range (:w this))
-                 y (range (:h this))]
-             (with-translation [(* x tile-w)
-                                (* y tile-h)]
-               (((:tiles this) [x y]) tile-w tile-h)))))
-        (do
-          ;draw from cache
-          )))
-    (cache [this]
-           ;save rendering of this layer alone.
-           ))
+  (draw [this]
+    (let [tile-h (/ (height) (:h this))
+           tile-w (/ (width) (:w this))]
+      (doall
+       (for [x (range (:w this))
+             y (range (:h this))]
+         (with-translation [(Math/ceil (* x tile-w))
+                            (Math/ceil (* y tile-h))]
+           (((:tiles this) [x y]) (Math/floor tile-w) (Math/floor tile-h)))))))
   (update [this]
     ((:update this))))
 

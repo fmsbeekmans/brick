@@ -8,6 +8,7 @@
 (declare brick-load)
 (declare update!)
 (declare setup)
+(declare layers)
 
 (def
   #^{:doc "The current application"
@@ -28,10 +29,12 @@
       :setup (fn []
                (binding [bricklett bricklett]
                  (debug/toggle dbg)
-                 (debug/add-line dbg "init-args" (atom bricklett))))
+                 (debug/add-line dbg "init-args" (atom (first @(layers))))
+                 (setup)))
       :title (:title bricklett)
       :draw #(binding [bricklett bricklett]
-               (debug/draw dbg))
+               (update!)
+               (.draw (first @(layers))))
       :size (:size bricklett))))
 
 (defn- init-tiles!
@@ -78,20 +81,22 @@
   "Actually render the layers."
   []
   {:pre [(active?)]}
-
-  (comment
-    (tile/with-tiles (vec @(:tiles bricklett))
-      (map (fn [layer]
-             (tile/with-dictionary (:dictionary layer)
-               (.draw layer)))
-           layers))))
+  (tile/with-tiles (vec @(tiles))
+    (background 0)
+    (frame-rate 10)
+    (text (pr-str @(:layers bricklett)) 10 20)
+    (map (fn [layer]
+           (tile/with-dictionary (:dictionary layer)
+             (.draw layer)
+           ))
+         @(layers))))
 
 (defn- update!
   "Clock tick"
   []
   {:pre [(active?)]}
-  (render!)
-  ;(map #(.update %) (:layers bricklett))
+  ((var render!))
+  ;(map #(update %) (:layers bricklett))
   )
 
 (defmacro brick-load
@@ -104,6 +109,21 @@
   []
   (brick-load
    :title "Tyler"
-   :size [640 320]
+   :size [1920 1080]
    :tiles (atom [])
-   :layers (atom "aoe")))
+   :layers (atom [(layer/init-grid-layer
+                   96 54 (fn [x y]
+                           (fn [h w]
+                             (fill 40)
+                             (if (odd? (+ x y))
+                               (stroke 0 255 0)
+                               (stroke 0 0 255))
+                             (rect 0 0 h w)))
+                   {:t 1})
+                  (layer/init-grid-layer
+                   3 5 (fn [x y]
+                         (fn [h w]
+                           (if (odd? (+ x y))
+                             (fill 255 0 0)
+                             (rect 0 0 h w))))
+                   nil)])))
