@@ -8,7 +8,7 @@
 
 (defrecord GridLayer
 ; "A Layer that consists of a h times w grid of tiles"
-  [h w tiles update cache?]
+  [h w tiles dictionary update cache?]
   Layer
   (draw [this cache]
     (if (not (cache? this))
@@ -28,11 +28,11 @@
            ;save rendering of this layer alone.
            ))
   (update [this]
-    ((:this update))))
+    ((:update this))))
 
 (defn init-grid-layer
   "Initialize a new grid"
-  [h w init-fn]
+  [h w init-fn dictionary]
   {:pre [(>= (* h w) 0)]}
   (GridLayer. h w
               (apply hash-map
@@ -42,6 +42,7 @@
                       (doall (for [x (range w)
                                    y (range h)]
                                [[x y] (init-fn x y)]))))
+              dictionary
               #()
               #(false)))
 

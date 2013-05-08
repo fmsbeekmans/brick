@@ -12,34 +12,53 @@
      :dynamic true}
   bricklett nil)
 
-(defn start
-  "Launch a test application"
-  []
-  (brick-load
-   "Tyler"
-   [640 320]
-   #()
-   (atom [])
-   (atom []) nil))
-
 (defn active?
   "Is there a running ap?"
   []
   bricklett)
 
-(defn- setup
-  "Prepare the engine"
+(defn defbrick
+  "Create a new brick"
+  [sym & opts]
+  {:pre [(not (active?))]}
+  (println opts)
+  (binding [bricklett (apply hash-map opts)]
+    (defsketch sym
+      :setup (:setup bricklett)
+      :title (:title bricklett)
+      :draw (:update bricklett)
+      :size (:size bricklett))))
+
+(defn start!
+  "Launch a test application"
   []
+  (brick-load
+   :title "Tyler"
+   :size [640 320]
+   :setup #()
+   :tiles (atom [])
+   :init-tiles #()
+   :layers (atom [])
+   :draw #()))
+
+(defn- init-tiles!
+  "initialize tiles"
+  [source-image]
   {:pre [(active?)]}
   (swap! (:tiles bricklett)
          (fn [tiles]
            (concat tiles
                    (tile/load-tiles
-                    (load-image "resources/tiles2.png") 32))))
-    (smooth))
+                    (load-image "resources/tiles2.png") 32)))))
+
+(defn- setup!
+  "Prepare the engine"
+  []
+  {:pre [(active?)]}
+  (smooth)
+  (init-tiles!))
 
 (defn title
-
   "The title of the running application"
   []
   {:pre [(active?)]}
@@ -63,31 +82,24 @@
   {:pre [(active?)]}
   (:tiles bricklett))
 
-(defn- render
-;  "Actually render the layers."
-  []
-  {:pre [(active?)]}
-  (map #(.draw %) (layers)))
-
-(defn- update
-  "Clock tick"
+(defn- render!
+  "Actually render the layers."
   []
   {:pre [(active?)]}
   (tile/with-tiles (vec @(:tiles bricklett))
-    (tile/with-dictionary {:paths {:road 0
-                                   :canal 3
-                                   :railroad 5}
-                             :b 1
-                             :c 2}
-      ((tile/tile :paths :canal) 32))))
+    (map (fn [layer]
+           (tile/with-dictionary (:dictionary layer)
+             (.draw layer)))
+         layers)))
+
+(defn- update!
+  "Clock tick"
+  []
+  {:pre [(active?)]}
+  (render!)
+  (map #(.update %) (:layers bricklett)))
 
 (defmacro brick-load
   "Start a brick application"
   [& args]
-  {:pre [(nil? bricklett)]}
-  `(binding [bricklett (apply hash-map ~(vec args))])
-  `(defsketch ~(title)
-     :title ~(title)
-     :setup ~(setup)
-     :draw ~(update)
-     :size ~(size)))
+  `(defbrick '~(symbol (:title (apply hash-map args))) ~@args))
