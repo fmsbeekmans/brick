@@ -2,124 +2,24 @@
   (:use [quil.core :exclude [size]])
   (:require [brick.tile :as tile]
             [brick.layer :as layer]
-            [brick.debug :as debug])
-  (:import [brick.layer GridLayer]))
+            [brick.debug :as debug]
+            [brick.drawable :as drawable])
+  (:import [brick.drawable Bricklett]))
 
-(declare brick-load)
-(declare update!)
-(declare setup)
-(declare layers)
+(defmacro defbricklett
+  [layers & args]
+  `(let [bricklett# (tile/Bricklett. ~layers)]
+     (assoc bricklett# ~@args)))
 
-(def
-  #^{:doc "The current application"
-     :dynamic true}
-  bricklett nil)
+(defmacro brick-sketch
+  [sym bricklett]
+  `(defsketch ~sym
+     :draw (or (:draw ~bricklett)
+               #())
+     :setup (or (:setup ~bricklett)
+                #())
+     :size (or (:size ~bricklett)
+               [200 200])
+     :title (or (:title ~bricklett)
+                "")))
 
-(defn active?
-  "Is there a running ap?"
-  []
-  bricklett)
-
-(defn defbrick
-  "Create a new brick"
-  [sym & opts]
-  (let [dbg (debug/simple-dbg)
-        bricklett (apply hash-map opts)]
-    (defsketch sym
-      :setup (fn []
-               (binding [bricklett bricklett]
-                 (debug/toggle dbg)
-                 (debug/add-line dbg "init-args" (atom (first @(layers))))
-                 (setup)))
-      :title (:title bricklett)
-      :draw #(binding [bricklett bricklett]
-               (update!)
-;               (.draw (first @(layers)))
-      :size (:size bricklett)))))
-
-(defn- init-tiles!
-  "initialize tiles"
-  [source-image]
-  {:pre [(active?)]}
-  (swap! (:tiles bricklett)
-         (fn [tiles]
-           (concat tiles
-                   (tile/load-tiles
-                    (load-image "resources/tiles2.png") 32)))))
-
-(defn setup
-  "Prepare the engine"
-  []
-  {:pre [(active?)]}
-  (background 0))
-
-(defn title
-  "The title of the running application"
-  []
-  {:pre [(active?)]}
-  (:title bricklett))
-
-(defn size
-  "The size of the running application"
-  []
-  {:pre [(active?)]}
-  (:size bricklett))
-
-(defn layers
-  "The layers the engine will render"
-  []
-  {:pre [(active?)]}
-  (:layers bricklett))
-
-(defn tiles
-  "The tiles the game tile layers can use"
-  []
-  {:pre [(active?)]}
-  (:tiles bricklett))
-
-(defn- render!
-  "Actually render the layers."
-  []
-  {:pre [(active?)]}
-  (tile/with-tiles (vec @(tiles))
-    (doseq [layer @(layers)]
-      (tile/with-dictionary (:dictionary layer)
-        (.draw layer)))))
-
-(defn- update!
-  "Clock tick"
-  []
-  {:pre [(active?)]}
-  ((var render!))
-  ;(map #(update %) (:layers bricklett))
-  )
-
-(defmacro brick-load
-  "Start a brick application"
-  [& args]
-  `(defbrick '~(symbol (:title (apply hash-map args))) ~@args))
-
-(defn start!
-  "Launch a test application"
-  []
-  (brick-load
-   :title "Tyler"
-   :size [1920 1080]
-   :tiles (atom [])
-   :layers (atom [(layer/init-grid-layer
-                   5 1 (fn [x y]
-                           (fn [h w]
-                             (fill 40)
-                             (if (odd? (+ x y))
-                               (stroke 0 255 0)
-                               (stroke 0 0 255))
-                             (rect 0 0 h w)))
-                   {:t 1})
-                  (layer/init-grid-layer
-                   3 5 (fn [x y]
-                         (fn [h w]
-                           (when (odd? (+ x y))
-                             (stroke 255 0 0)
-                             (fill 200)
-                             (rect 0 0 h w))))
-                   nil)])))
