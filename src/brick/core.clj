@@ -7,15 +7,17 @@
   (:import [brick.drawable Bricklet]
            [brick.drawable Image]
            [brick.drawable Grid]
-           [brick.drawable StackLayer])
+           [brick.drawable Stack])
   (:gen-class))
 
 (defmacro defbricklet
+  "Create a new bricklet"
   [layers & args]
   `(let [bricklet# (drawable/Bricklet. ~layers)]
      (assoc bricklet# ~@args)))
 
 (defmacro brick-sketch
+  "Start sketching a bricklet."
   [sym bricklet]
   `(defsketch ~sym
      :draw (fn []
@@ -26,7 +28,9 @@
      :title (or (:title ~bricklet)
                 "")))
 
-(defn setup [bricklet]
+(defn setup
+  "Prepare an bricklet. This includes initializing tiles and layers."
+  [bricklet]
   (swap!
    (:images bricklet)
    (fn [old]
@@ -40,21 +44,45 @@
                          (swap! (:layers bricklet)
                                 (fn [old]
                                   [(drawable/Grid. 3 2
-                                                   {[0 0] (drawable/StackLayer. [(image/get-image-in bricklet :bricks)
+                                                   {[0 0] (drawable/Stack. [(image/get-image-in bricklet :bricks)
                                                                                  (image/get-image-in bricklet :bush-l)])
                                                     [1 0] (image/get-image-in bricklet :bush-r)
                                                     [2 0] (image/get-image-in bricklet 6)
                                                     [0 1] (image/get-image-in bricklet :bush-r)
                                                     [1 1] (drawable/Grid. 3 2
-                                                                          {[0 0] (image/get-image-in bricklet :bush-l)
-                                                                           [1 0] (image/get-image-in bricklet :bush-r)
-                                                                           [2 0] (image/get-image-in bricklet 6)
-                                                                           [0 1] (image/get-image-in bricklet :bush-r)
-                                                                           [1 1] (image/get-image-in bricklet :bush-l)
+                                                                          {[0 0] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))))
+                                                                           [1 0] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))                                                                                                                     ))
+                                                                           [2 0] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))
+                                                                                                                     ))
+                                                                           [0 1] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))
+                                                                                                                     ))
+                                                                           [1 1] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))
+                                                                                                                     ))
                                                                            [2 1] (drawable/Image. (image/new-p-image [10 10]
-                                                                                                                     (background 255 0 0)))})
+                                                                                                                     (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))
+                                                                                                                     ))})
                                                     [2 1] (drawable/Image. (image/new-p-image [10 10]
-                                                                                              (background 255 0 0)))})])))
+                                                                                              (background (rand-int 256)
+                                                                                                                                 (rand-int 256)
+                                                                                                                                 (rand-int 256))
+                                                                                                                     ))})])))
           :dictionary {:bricks 1
                        :bush-l 4
                        :bush-r 5}

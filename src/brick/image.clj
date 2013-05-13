@@ -16,6 +16,7 @@ p-image map"
 
 (defmacro new-p-image
   [[w h] & body]
+  "Create a new p image of w by h pixels and draw body on it."
   `(let [graph# (create-graphics ~w ~h :java2d)]
      (with-graphics graph#
        (do ~@body))
@@ -23,6 +24,7 @@ p-image map"
 
 (defn append-images!
   [new [w h] tiles]
+  "Append the image new to the list of tiles of size wxh.png, create one if none exists."
   (io!
    (let [orig (or
                (load-image (str "resources/" w "x" h ".png"))
@@ -41,6 +43,7 @@ p-image map"
      i)))
 
 (defmacro get-image-in
+  "Get an image from the bricklet's dictionary from the bricklet's image library."
   [bricklet & path]
   `(nth @(:images ~bricklet)
         (dictionary (:dictionary ~bricklet) ~@path)))

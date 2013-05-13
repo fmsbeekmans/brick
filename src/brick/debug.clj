@@ -2,12 +2,14 @@
   (:use [quil.core]))
 
 (defprotocol HUDDebug
-  (toggle [_])
-  (add-line [_ text derefable])
-  (remove-line [_ derefable])
-  (draw [_]))
+  "Make a debugger on the current graphics."
+  (toggle [_] "Turn the debug visible and invisible")
+  (add-line [_ text derefable] "Add some extra information to the debugger.")
+  (remove-line [_ derefable] "Remove a line from the debugger.")
+  (draw [_] "Draw the debugger."))
 
 (defn simple-dbg []
+  "Create a new simple debugger on the current screen."
   (let [visible? (atom false)
         lines (atom {})]
     (reify HUDDebug
