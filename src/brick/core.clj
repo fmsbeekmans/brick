@@ -6,7 +6,8 @@
             [quil.applet :as app])
   (:import [brick.drawable Bricklet]
            [brick.drawable Image]
-           [brick.drawable Grid])
+           [brick.drawable Grid]
+           [brick.drawable StackLayer])
   (:gen-class))
 
 (defmacro defbricklet
@@ -38,12 +39,22 @@
           :layers-init (fn [bricklet]
                          (swap! (:layers bricklet)
                                 (fn [old]
-                                  [(drawable/Grid. 3 2 {[0 0] (image/get-image-in bricklet :bush-l)
-                                                        [1 0] (image/get-image-in bricklet :bush-r)
-                                                        [2 0] (image/get-image-in bricklet 6)
-                                                        [0 1] (image/get-image-in bricklet :bush-r)
-                                                        [1 1] (image/get-image-in bricklet :bush-l)
-                                                        [2 1] (image/get-image-in bricklet :bricks)})])))
+                                  [(drawable/Grid. 3 2
+                                                   {[0 0] (drawable/StackLayer. [(image/get-image-in bricklet :bricks)
+                                                                                 (image/get-image-in bricklet :bush-l)])
+                                                    [1 0] (image/get-image-in bricklet :bush-r)
+                                                    [2 0] (image/get-image-in bricklet 6)
+                                                    [0 1] (image/get-image-in bricklet :bush-r)
+                                                    [1 1] (drawable/Grid. 3 2
+                                                                          {[0 0] (image/get-image-in bricklet :bush-l)
+                                                                           [1 0] (image/get-image-in bricklet :bush-r)
+                                                                           [2 0] (image/get-image-in bricklet 6)
+                                                                           [0 1] (image/get-image-in bricklet :bush-r)
+                                                                           [1 1] (image/get-image-in bricklet :bush-l)
+                                                                           [2 1] (drawable/Image. (image/new-p-image [10 10]
+                                                                                                                     (background 255 0 0)))})
+                                                    [2 1] (drawable/Image. (image/new-p-image [10 10]
+                                                                                              (background 255 0 0)))})])))
           :dictionary {:bricks 1
                        :bush-l 4
                        :bush-r 5}
@@ -53,5 +64,3 @@
 (defn -main [& args]
   (brick-sketch a br))
 
-(comment [(drawable/GridLayer. 2 1 {[0 0] (@(:images bricklet) 2)
-                                    [1 0] (@(:images bricklet) 3)})])

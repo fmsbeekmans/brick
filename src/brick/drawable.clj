@@ -25,7 +25,6 @@
   (draw [this [w h]]
     (doseq [x (range (:w this))
             y (range (:h this))]
-      (text (pr-str [(* x (/ w (:w this)))]) 20 (+ 40 (* x 20)))
       (with-translation [(* x (/ w (:w this)))
                          (* y (/ h (:h this)))]
         (.draw ((:grid this) [x y]) [(/ w (:w this))
