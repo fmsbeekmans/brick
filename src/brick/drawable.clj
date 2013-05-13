@@ -1,7 +1,7 @@
 (ns brick.drawable
   (:use quil.core))
 
-(defn ranges [n pixels]
+(defn- ranges [n pixels]
   "Return a list of [offset size] so that pixels is devided into n pieces."
   (let [size (/ pixels n)]
     (vec
@@ -47,7 +47,6 @@
               y (range (:h this))]
         (with-translation [(get-in h-ranges [x 0])
                            (get-in v-ranges [y 0])]
-          (text "a" 20 20)
           (.draw ((:grid this) [x y])
                  [(get-in h-ranges [x 1])
                   (get-in v-ranges [y 1])]))))))
@@ -58,5 +57,9 @@
   (draw [this [w h]]
     "Draw the applet."
     (doseq [layer @(:layers this)]
-      (.draw layer [w h]))))
+      (.draw layer [w h]))
+    (doseq [command @(:execute-que this)]
+      (command))
+    (reset! (:execute-que this) []))) ;vec, conjed on the end so the
+                                      ;commands execute in order.
  
