@@ -2,16 +2,11 @@
   (:use midje.sweet)
   (:use [brick.core]))
 
-(facts :gui "brick initializes"
-       (fact "title is correct")
-       (fact "setup is ran")
-       (fact "draw is called")
-       (fact "size is correct")
-       (fact "tile atom is used")
-       (fact "layers atom is used"))
+(fact "defbricklet creates a new Bricklet."
+  )
 
-(facts "can't call certain methods without running bricklett.")
+(fact "brick-sketch sketches a bricklet in a quil sketch."
+  )
 
-(fact :gui "render draws all layers in order")
-
-(fact :gui "update works")
+(fact "setup prepare a bricklet for rendering."
+  )
