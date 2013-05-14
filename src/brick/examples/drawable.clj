@@ -9,7 +9,7 @@
           (atom [])
           :layers-init (fn [bricklet]
                          (swap! (:layers bricklet)
-                                (fn [old]                                  
+                                (fn [old]
                                   [(->Grid 2 1 {[0 0] (->Image (load-image "colors.png"))
                                                [1 0] (->Stack [(get-image-in bricklet :bush-l)
                                                               (->Grid 1 2 {[0 0] (get-image-in bricklet 0)
@@ -24,4 +24,4 @@
 (brick-sketch a br)
 
 (schedule br (fn []
-              (background 0 100 0)))
+              (background 50 50 100)))
