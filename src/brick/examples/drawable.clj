@@ -1,12 +1,8 @@
 (ns brick.examples.drawable
   (:use [quil.core :exclude [size]]
         brick.core
-        brick.drawable)
-  (:require [brick.image :as image])
-  (:import [brick.drawable Bricklet]
-           [brick.drawable Image]
-           [brick.drawable Grid]
-           [brick.drawable Stack])
+        brick.drawable
+        brick.image)
   (:gen-class))
 
 (def br (defbricklet
@@ -14,10 +10,10 @@
           :layers-init (fn [bricklet]
                          (swap! (:layers bricklet)
                                 (fn [old]                                  
-                                  [(Grid. 2 1 {[0 0] (image/get-image-in bricklet :bricks)
-                                               [1 0] (Stack. [(image/get-image-in bricklet :bush-l)
-                                                              (Grid. 1 2 {[0 0] (image/get-image-in bricklet 0)
-                                                                          [0 1] (image/get-image-in bricklet 7)})])})])))
+                                  [(->Grid 2 1 {[0 0] (->Image (load-image "colors.png"))
+                                               [1 0] (->Stack [(get-image-in bricklet :bush-l)
+                                                              (->Grid 1 2 {[0 0] (get-image-in bricklet 0)
+                                                                          [0 1] (get-image-in bricklet 7)})])})])))
           :execute-queue (atom [])
           :dictionary {:bricks 1
                        :bush-l 4

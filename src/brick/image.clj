@@ -6,12 +6,12 @@
 (defn load-images
   "Return a function that given a keyword index map, returns a keyword
 p-image map"
-  [source-image tile-width]
-  (let [n-tiles (/ (.width source-image) tile-width)
+  [source-image [tile-w tile-h]]
+  (let [n-tiles (/ (.width source-image) tile-w)
         indexed-tiles
         (for [i (take n-tiles
-                      (iterate (partial + tile-width) 0))]
-          (Image. (.get source-image i 0 tile-width tile-width)))]
+                      (iterate (partial + tile-w) 0))]
+          (Image. (.get source-image i 0 tile-w tile-h)))]
     (vec indexed-tiles)))
 
 (defmacro new-p-image

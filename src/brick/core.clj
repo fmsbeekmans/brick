@@ -3,16 +3,12 @@
         brick.drawable)
   (:require [brick.image :as image]
             quil.applet)
-  (:import [brick.drawable Bricklet]
-           [brick.drawable Image]
-           [brick.drawable Grid]
-           [brick.drawable Stack])
   (:gen-class))
 
 (defmacro defbricklet
   "Create a new bricklet"
   [layers & args]
-  `(let [bricklet# (Bricklet. ~layers)]
+  `(let [bricklet# (->Bricklet ~layers)]
      (assoc bricklet# ~@args)))
 
 (defmacro brick-sketch
@@ -35,7 +31,7 @@
    (:images bricklet)
    (fn [old]
      (concat old
-             (image/load-images (load-image "resources/32x32.png") 32))))
+             (image/load-images (load-image "resources/32x32.png") [32 32]))))
   ((:layers-init bricklet) bricklet))
 
 (defn schedule [bricklet command]
