@@ -14,34 +14,6 @@ p-image map"
           (Image. (.get source-image i 0 tile-w tile-h)))]
     (vec indexed-tiles)))
 
-(comment (defmacro new-p-image
-           [[w h] & body]
-           "Create a new p image of w by h pixels and draw body on it."
-           `(let [graph# (create-graphics ~w ~h :java2d)]
-              (with-graphics graph#
-                (do ~@body))
-              graph#)))
-
-(comment  (defn append-images!
-            [new [w h] tiles]
-            "Append the image new to the list of tiles of size wxh.png, create one if none exists."
-            (io!
-             (let [orig (or
-                         (load-image (str "resources/" w "x" h ".png"))
-                         nil)
-                   i (if orig
-                       (/ (.width orig) w)
-                       0)
-                   graph (create-graphics (* (inc i) w) h :java2d)]
-               (if orig (with-graphics graph
-
-                          (if orig
-                            (image orig 0 0))
-                          (image new (.width orig) 0 w h)))
-               (.save graph  (str "resources/" w "x" h ".png"))
-               (swap! tiles conj new)
-               i))))
-
 (defmacro get-image-in
   "Get an image from the bricklet's dictionary from the bricklet's image library."
   [bricklet & path]
