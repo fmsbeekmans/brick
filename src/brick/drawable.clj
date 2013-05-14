@@ -63,5 +63,3 @@
       (doseq [command commands]         ;commands execute in order.
         (command)))
 ))
-
- 
