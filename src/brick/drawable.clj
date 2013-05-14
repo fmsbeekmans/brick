@@ -58,8 +58,10 @@
     "Draw the applet."
     (doseq [layer @(:layers this)]
       (.draw layer [w h]))
-    (doseq [command @(:execute-que this)]
-      (command))
-    (reset! (:execute-que this) []))) ;vec, conjed on the end so the
-                                      ;commands execute in order.
+    (let [commands  @(:execute-queue this)]
+      (reset! (:execute-queue this) []) ;vec, conjed on the end so the
+      (doseq [command commands]         ;commands execute in order.
+        (command)))
+))
+
  

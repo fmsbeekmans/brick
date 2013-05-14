@@ -14,8 +14,11 @@
           :layers-init (fn [bricklet]
                          (swap! (:layers bricklet)
                                 (fn [old]                                  
-                                  [(image/get-image-in bricklet :bricks)])))
-          :execute-que (atom [])
+                                  [(Grid. 2 1 {[0 0] (image/get-image-in bricklet :bricks)
+                                               [1 0] (Stack. [(image/get-image-in bricklet :bush-l)
+                                                              (Grid. 1 2 {[0 0] (image/get-image-in bricklet 0)
+                                                                          [0 1] (image/get-image-in bricklet 7)})])})])))
+          :execute-queue (atom [])
           :dictionary {:bricks 1
                        :bush-l 4
                        :bush-r 5}
@@ -24,3 +27,5 @@
 
 (brick-sketch a br)
 
+(schedule br (fn []
+              (background 0 100 0)))

@@ -38,5 +38,5 @@
              (image/load-images (load-image "resources/32x32.png") 32))))
   ((:layers-init bricklet) bricklet))
 
-(defn scedule [bricklet command]
-  (swap! (:execute-que bricklet) conj command))
+(defn schedule [bricklet command]
+  (swap! (:execute-queue bricklet) conj command))
