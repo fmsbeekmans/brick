@@ -49,6 +49,11 @@
                  [(get-in h-ranges [x 1])
                   (get-in v-ranges [y 1])]))))))
 
+(defrecord Nothing []
+  #^{:dow "A placeholder for an empty (/transparant) space."}
+  Drawable
+  (draw [_ _]))
+
 (defrecord Bricklet [layers command-queue]
   #^{:doc "A special stacklayer."}
   Drawable
