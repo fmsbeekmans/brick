@@ -4,8 +4,6 @@
   (:import [brick.drawable Image]))
 
 (defn load-images
-  "Return a function that given a keyword index map, returns a keyword
-p-image map"
   [source-image [tile-w tile-h]]
   (let [n-tiles (/ (.width source-image) tile-w)
         indexed-tiles
