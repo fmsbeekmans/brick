@@ -53,7 +53,8 @@
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (doseq [layer @layers)]
+    (doseq [layer @layers]
       (.draw layer [w h]))
-      (doseq [command @command-queue]
-        (command this)))
+    (doseq [command @command-queue]
+      (command this))
+    (reset! command-queue [])))
