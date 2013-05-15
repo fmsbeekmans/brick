@@ -1,25 +1,20 @@
 (ns brick.debug
-  (:use [quil.core]))
+  (:use [quil.core])
+  (:require [brick.drawable :as drawable]))
 
 (defprotocol HUDDebug
   "Make a debugger on the current graphics."
   (toggle [_] "Turn the debug visible and invisible")
   (add-line [_ text derefable] "Add some extra information to the debugger.")
-  (remove-line [_ derefable] "Remove a line from the debugger.")
-  (draw [_] "Draw the debugger."))
+  (remove-line [_ derefable] "Remove a line from the debugger."))
 
 (defn simple-dbg []
-  "Create a new simple debugger on the current screen."
+  "Create a new simple debugger"
   (let [visible? (atom false)
         lines (atom {})]
-    (reify HUDDebug
-      (toggle [_]
-        (swap! visible? not))
-      (add-line [_ text derefable]
-        (swap! lines #(assoc % derefable text)))
-      (remove-line [_ derefable]
-        (swap! lines #(dissoc % derefable)))
-      (draw [_]
+    (reify
+      drawable/Drawable
+      (drawable/draw [_ [_ _]]
         (if @visible?
           (do
             (push-style)
@@ -31,4 +26,11 @@
                       (fill 255)
                       (text (str t ": " @d) 20 (+ 20 (* 20 i))))
                     @lines (iterate inc 0)))
-            (pop-style)))))))
+            (pop-style))))
+      HUDDebug
+      (toggle [_]
+        (swap! visible? not))
+      (add-line [_ text derefable]
+        (swap! lines #(assoc % derefable text)))
+      (remove-line [_ derefable]
+        (swap! lines #(dissoc % derefable))))))
