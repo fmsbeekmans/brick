@@ -2,7 +2,7 @@
   (:use quil.core))
 
 (defn- ranges [n pixels]
-  "Return a list of [offset size] so that pixels is devided into n pieces."
+  "Return a list of [offset size] so that pixels is divided into n pieces."
   (let [size (/ pixels n)]
     (vec
      (for [i (range n)]
@@ -20,14 +20,13 @@
   [img]
   Drawable
   (draw [this [w h]]
-    "Draw the current image w times h pixels large."
     (image (:img this) 0 0 w h)))
 
 (defrecord FloatingImage
     #^{:doc "A floating image."}
   [image topleft scale orientation]
   Drawable
-  (draw [this [w h]] "Draw this images at the right location."))
+  (draw [this [w h]]))
 
 (defrecord Stack [layers]
   #^{:doc "A stack of drawables on top of one another."}
@@ -40,7 +39,6 @@
   #^{:doc "A grid of drawables exactly side by side."}
   Drawable
   (draw [this [w h]]
-    "Draw all the tiles next to one another."
     (let [h-ranges (ranges (:w this) w)
           v-ranges (ranges (:h this) h)]
       (doseq [x (range (:w this))
@@ -51,15 +49,11 @@
                  [(get-in h-ranges [x 1])
                   (get-in v-ranges [y 1])]))))))
 
-(defrecord Bricklet [layers]
+(defrecord Bricklet [layers command-queue]
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    "Draw the applet."
-    (doseq [layer @(:layers this)]
+    (doseq [layer @layers)]
       (.draw layer [w h]))
-    (let [commands  @(:execute-queue this)]
-      (reset! (:execute-queue this) []) ;vec, conjed on the end so the
-      (doseq [command commands]         ;commands execute in order.
-        (command)))
-))
+      (doseq [command @command-queue]
+        (command this)))
