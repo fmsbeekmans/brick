@@ -63,3 +63,9 @@
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
+
+(defrecord DerefMiddleware [target]
+  Drawable
+  (draw [this [w h]]
+    (.draw @(:target this) [w h])))
+
