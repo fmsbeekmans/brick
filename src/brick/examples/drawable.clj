@@ -35,4 +35,8 @@
   (swap! (:command-queue bricklet) conj (fn [_] (background 50 50 100))))
 
 (defn -main [& args]
-  (def br (drawable/->Bricklet layers commands)))
+  (def br (drawable/->Bricklet layers commands))
+  (def br-sketch (bricklet-sketch br
+                                  :setup #(setup br)
+                                  :size [500 500]
+                                  :title "Let there be title!")))
