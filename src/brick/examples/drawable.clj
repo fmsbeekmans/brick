@@ -27,6 +27,7 @@
   "Prepare a bricklet. This includes initializing tiles and layers."
   [bricklet]
   (frame-rate 2)
+  (background 0)
   (swap! images images-init)
   (swap! (:layers bricklet) layers-init))
 
