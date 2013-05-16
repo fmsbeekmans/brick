@@ -24,7 +24,7 @@
                       (stroke 0)
                       (rect 20 (+ 5 (* 20 i)) 300 20 )
                       (fill 255)
-                      (text (str t ": " @d) 20 (+ 20 (* 20 i))))
+                      (text (str t ": " (pr-str @d)) 20 (+ 20 (* 20 i))))
                     @lines (iterate inc 0)))
             (pop-style))))
       HUDDebug
