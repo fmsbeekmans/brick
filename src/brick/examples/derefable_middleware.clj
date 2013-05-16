@@ -36,12 +36,13 @@
 
 (def br (drawable/->Bricklet layers commands))
 
-(def br-sketch (bricklet-sketch br
-                                :setup #(setup br)
-                                :size [500 500]
-                                :title "Let there be title!"))
+(defn -main [& args]
+  (def br-sketch (bricklet-sketch br
+                                  :setup #(setup br)
+                                  :size [500 500]
+                                  :title "Let there be title!"))
 
-(. Thread sleep 2000)
+  (. Thread sleep 2000)
 
-(swap! commands conj (fn [bricklet]
-                       (swap! (:target @proxy-middleware) conj @swap-img)))
+  (swap! commands conj (fn [bricklet]
+                         (swap! (:target @proxy-middleware) conj @swap-img))))
