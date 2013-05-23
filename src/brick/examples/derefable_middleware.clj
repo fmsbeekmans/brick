@@ -38,12 +38,10 @@
                              :init init
                              :size [500 500]
                              :title "Let there be title!"))
-(println br)
+
 
 (defn -main [& args]
   (def br-sketch (bricklet-sketch br))
-
   (. Thread sleep 2000)
-
   (swap! commands conj (fn [bricklet]
-                         (swap! (:target @proxy-middleware) conj @swap-img))))
+                         (swap! (:target-drawable @proxy-middleware) conj @swap-img))))
