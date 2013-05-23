@@ -22,25 +22,26 @@
   (let [lookup #(@images (image/dictionary dict %))]
     (swap! proxy-middleware (fn [_]
                               (drawable/->DerefMiddleware (atom (lookup 7)))))
-    [@proxy-middleware]))
+    @proxy-middleware))
 
-(defn- setup
+(defn- init
   "Prepare a bricklet. This includes initializing tiles and layers."
   [bricklet]
   (frame-rate 2)
   (background 0)
   (swap! images images-init)
-  (swap! (:layers bricklet) layers-init)
+  (swap! (:target-drawable bricklet) layers-init)
   (swap! swap-img (fn [_]
                     (drawable/->Image (load-image "resources/32x32.png")))))
 
-(def br (drawable/->Bricklet layers commands))
+(def br (drawable/->Bricklet (atom layers) commands
+                             :init init
+                             :size [500 500]
+                             :title "Let there be title!"))
+(println br)
 
 (defn -main [& args]
-  (def br-sketch (bricklet-sketch br
-                                  :setup #(setup br)
-                                  :size [500 500]
-                                  :title "Let there be title!"))
+  (def br-sketch (bricklet-sketch br))
 
   (. Thread sleep 2000)
 

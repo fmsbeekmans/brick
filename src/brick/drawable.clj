@@ -64,8 +64,15 @@
       (command this))
     (reset! command-queue [])))
 
-(defrecord DerefMiddleware [target]
+(defn ->Bricklet [target command-queue & opts]
+  (let [br (Bricklet. target command-queue)
+        opts-map (apply hash-map opts)
+        params {:size [100 100]
+                :title "No title"}
+        with-setup (merge params {:setup (:init params)})]
+    (apply (partial assoc br) (apply concat (merge params opts-map br)))))
+
+(defrecord DerefMiddleware [target-drawable]
   Drawable
   (draw [this [w h]]
-    (.draw @(:target this) [w h])))
-
+    (.draw @(:target-drawable this) [w h])))

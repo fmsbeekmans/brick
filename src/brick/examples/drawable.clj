@@ -17,26 +17,30 @@
 
 (defn- layers-init [old]
   (let [lookup #(@images (image/dictionary dict %))]
-    [(drawable/->Grid 2 1
-                      {[0 0] (drawable/->Image (load-image "colors.png"))
-                       [1 0] (drawable/->Stack [(lookup :bush-l)
-                                                (drawable/->Grid 1 2 {[0 0] (drawable/->Nothing)
-                                                                      [0 1] (lookup 7)})])})]))
+    (drawable/->Grid 2 1
+                     {[0 0] (drawable/->Image (load-image "colors.png"))
+                      [1 0] (drawable/->Stack [(lookup :bush-l)
+                                               (drawable/->Grid 1 2 {[0 0] (drawable/->Nothing)
+                                                                     [0 1] (lookup 7)})])})))
 
-(defn- setup
+(defn- init
   "Prepare a bricklet. This includes initializing tiles and layers."
   [bricklet]
   (frame-rate 2)
   (background 0)
   (swap! images images-init)
-  (swap! (:layers bricklet) layers-init))
+  (swap! (:target-drawable bricklet) layers-init))
 
 (defn color-bg [bricklet]
   (swap! (:command-queue bricklet) conj (fn [_] (background 50 50 100))))
 
-(defn -main [& args]
-  (def br (drawable/->Bricklet layers commands))
-  (def br-sketch (bricklet-sketch br
-                                  :setup #(setup br)
-                                  :size [500 500]
-                                  :title "Let there be title!")))
+;een init maken voor de target-drawable, kan alleen Nothing en
+;composieties daarvan initializeren
+
+(do
+  (def br (drawable/->Bricklet layers commands
+                               :init init
+                               :size [500 500]
+                               :title "Let there be title!"))
+  (println layers)
+  (bricklet-sketch br))

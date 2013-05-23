@@ -12,11 +12,10 @@
 
 (defn bricklet-sketch
   "Creates a sketch from a bricklet and quil options"
-  [bricklet & args]
-  (let [defaults
-        {:draw #(draw bricklet [ (width) (height)])
-         :setup (fn [])
-         :size [100 100]
-         :title "No title"}
-        opts (merge defaults (namedargs args))]
-    (apply sketch (apply concat opts))))
+  [bricklet]
+
+  (apply sketch (apply concat
+                       (assoc {}
+                         :setup #((:init bricklet) bricklet)
+                         :draw (fn []
+                                 (.draw bricklet [(width) (height)]))))))
