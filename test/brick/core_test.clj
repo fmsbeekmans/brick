@@ -1,4 +1,4 @@
-(ns brick.t-core
+(ns brick.core-test
   (:use midje.sweet)
   (:use [brick.core]))
 
