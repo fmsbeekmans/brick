@@ -54,12 +54,12 @@
   Drawable
   (draw [_ _]))
 
-(defrecord Bricklet [layers command-queue]
+(defrecord Bricklet [target-drawable command-queue]
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (doseq [layer @layers]
-      (.draw layer [w h]))
+    (text (pr-str (:target-drawable this)) 20 20)
+    (.draw @target-drawable [w h])
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
