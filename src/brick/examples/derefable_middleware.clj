@@ -34,13 +34,11 @@
   (swap! swap-img (fn [_]
                     (drawable/->Image (load-image "resources/32x32.png")))))
 
-(def br (drawable/->Bricklet (atom layers) commands
+(defn -main [& args]
+  (def br (drawable/->Bricklet (atom layers) commands
                              :init init
                              :size [500 500]
                              :title "Let there be title!"))
-
-
-(defn -main [& args]
   (def br-sketch (bricklet-sketch br))
   (. Thread sleep 2000)
   (swap! commands conj (fn [bricklet]
