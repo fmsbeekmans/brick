@@ -13,9 +13,8 @@
 (defn bricklet-sketch
   "Creates a sketch from a bricklet and quil options"
   [bricklet]
-
   (apply sketch (apply concat
-                       (assoc {}
+                       (assoc bricklet
                          :setup #((:init bricklet) bricklet)
                          :draw (fn []
                                  (.draw bricklet [(width) (height)]))))))
