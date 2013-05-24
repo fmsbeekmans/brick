@@ -37,10 +37,9 @@
 ;een init maken voor de target-drawable, kan alleen Nothing en
 ;composieties daarvan initializeren
 
-(do
+(defn -main [& args]
   (def br (drawable/->Bricklet layers commands
                                :init init
                                :size [500 500]
                                :title "Let there be title!"))
-  (println layers)
   (bricklet-sketch br))

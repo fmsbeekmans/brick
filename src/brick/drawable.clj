@@ -58,19 +58,24 @@
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (text (pr-str (:target-drawable this)) 20 20)
     (.draw @target-drawable [w h])
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
 
-(defn ->Bricklet [target command-queue & opts]
-  (let [br (Bricklet. target command-queue)
-        opts-map (apply hash-map opts)
-        params {:size [100 100]
-                :title "No title"}
-        with-setup (merge params {:setup (:init params)})]
-    (apply (partial assoc br) (apply concat (merge params opts-map br)))))
+(defn ->Bricklet
+  ([]
+     (->Bricklet (atom []) (atom [])))
+  ([target]
+     (->Bricklet target (atom [])))
+  ([target command-queue & opts]
+     (let [br (Bricklet. target command-queue)
+           opts-map (apply hash-map opts)
+           params {:size [100 100]
+                   :title "No title"
+                   :images (atom [])}
+           with-setup (merge params {:setup (:init params)})]
+       (apply (partial assoc br) (apply concat (merge params opts-map br))))))
 
 (defrecord DerefMiddleware [target-drawable]
   Drawable
