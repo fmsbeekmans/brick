@@ -12,6 +12,18 @@
           (Image. (.get source-image i 0 tile-w tile-h)))]
     (vec indexed-tiles)))
 
+(defmacro in-draw-context
+  [expr]
+  `(let [p-expr# (promise)]
+     (sketch :target :none
+             :setup
+             (fn [] (deliver p-expr# ~expr)))
+     @p-expr#))
+
+(defn path->PImage
+ [path]
+ (in-draw-context (load-image path)))
+
 (defmacro get-image-in
   "Get an image from the bricklet's dictionary from the bricklet's image library."
   [bricklet & path]
