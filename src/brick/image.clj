@@ -33,3 +33,7 @@
 (defn dictionary [map key]
   (or (map key)
       key))
+
+;;TODO resource-image should return a record containing a dictionary key, rather than a PImage. This makes the record comparable and comparable is good.
+(defn resource-image [path]
+  (draw/->Image (path->PImage (clojure.java.io/resource path))))
