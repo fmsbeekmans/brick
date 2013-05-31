@@ -59,3 +59,9 @@
   (fact "Irrelevant entries in the tiles map are ignored."))
 
 (facts "Bricklet")
+
+(fact "drawable? on a non-drawable returns false."
+  (d/drawable? 42) => FALSEY)
+
+(fact "drawable? on a drawable returns true."
+  (d/drawable? (d/->Nothing)) => TRUTHY)
