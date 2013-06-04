@@ -16,6 +16,11 @@
   (draw [this [w h]]
     "Draw the given object w times h pixels large."))
 
+(defn drawable?
+  "Returns whether or not the given argument is a drawable."
+  [x]
+  (extends? Drawable (type x)))
+
 (defrecord Image
     #^{:doc "A drawable wrapper around a PImage. "}
   [img]
