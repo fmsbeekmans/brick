@@ -103,3 +103,13 @@
   Drawable
   (draw [this [w h]]
     (.draw @(:target-drawable this) [w h])))
+
+(defn drawable->sketch
+  "Creates a sketch from a bricklet and quil options"
+  [bricklet]
+  (apply sketch (apply concat
+                       (assoc bricklet
+                         :setup #((or (:init bricklet)
+                                      (fn [_])) bricklet)
+                         :draw (fn []
+                                 (.draw bricklet [(width) (height)]))))))

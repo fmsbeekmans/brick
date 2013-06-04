@@ -1,7 +1,7 @@
 (ns brick.drawable-test
   (:use midje.sweet)
   (:use [brick.image :only [load-images]])
-  (:use [brick.core :only [bricklet-sketch]])
+  (:use [brick.util])
   (:require [brick.drawable :as d])
   (:require [quil.core :as q]))
 

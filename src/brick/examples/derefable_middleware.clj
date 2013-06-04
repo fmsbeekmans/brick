@@ -1,6 +1,5 @@
 (ns brick.examples.derefable-middleware
-  (:use [quil.core :exclude [size]]
-        brick.core)
+  (:use [quil.core :exclude [size]])
   (:require [brick.drawable :as drawable]
             [brick.image :as image])
   (:gen-class))
@@ -39,7 +38,7 @@
                              :init init
                              :size [500 500]
                              :title "Let there be title!"))
-  (def br-sketch (bricklet-sketch br))
+  (def br-sketch (drawable/drawable->sketch br))
   (. Thread sleep 2000)
   (swap! commands conj (fn [bricklet]
                          (swap! (:target-drawable @proxy-middleware) conj @swap-img))))

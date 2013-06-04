@@ -6,5 +6,4 @@
   :profiles {:dev {:plugins [[lein-midje "3.0.0"]
                              [lein-cloverage "1.0.2"]]
                    :dependencies [[midje "1.5.0"]]}}
-  :main brick.core
   :aot [quil.applet])

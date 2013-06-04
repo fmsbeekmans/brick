@@ -1,6 +1,5 @@
 (ns brick.examples.drawable
-  (:use [quil.core :exclude [size]]
-        brick.core)
+  (:use [quil.core :exclude [size]])
   (:require [brick.drawable :as drawable]
             [brick.image :as image])
   (:gen-class))
@@ -42,4 +41,4 @@
                                :init init
                                :size [500 500]
                                :title "Let there be title!"))
-  (bricklet-sketch br))
+  (drawable/drawable->sketch br))
