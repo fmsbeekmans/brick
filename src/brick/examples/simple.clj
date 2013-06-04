@@ -1,4 +1,4 @@
-(ns brick.examples.floating
+(ns brick.examples.simple
   (:use [quil.core :exclude [size]]
         brick.core)
   (:require [brick.drawable :as drawable]
