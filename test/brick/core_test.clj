@@ -1,12 +1,5 @@
 (ns brick.core-test
   (:use midje.sweet)
-  (:use [brick.core]))
+  (:require [brick.core :as c]))
 
-(fact "defbricklet creates a new Bricklet."
-  )
 
-(fact "brick-sketch sketches a bricklet in a quil sketch."
-  )
-
-(fact "setup prepare a bricklet for rendering."
-  )
