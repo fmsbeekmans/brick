@@ -1,5 +1,6 @@
 (ns brick.drawable
-  (:use quil.core))
+  (:use quil.core
+        brick.util))
 
 (defn- ranges [n pixels]
   "Return a list of [offset size] so that pixels is divided into n pieces."
@@ -22,11 +23,27 @@
   (draw [this [w h]]
     (image (:img this) 0 0 w h)))
 
-(defrecord FloatingImage
-    #^{:doc "A floating image."}
-  [image topleft scale orientation]
+(defn rad [n]
+  (* Math/PI n))
+
+(defrecord Floating
+    #^{:doc "A wrapper for drawables to float a drawable."}
+  [drawable center-scales scale rotation]
   Drawable
-  (draw [this [w h]]))
+  (draw [this [w h]]
+    ;[x] eerst midden naar 0
+    ;[ ] dan transleren.
+    (with-translation (vec (map (fn [center-scale p]
+                                  (+
+                                   (- (* 0.5 (:scale this) p ))
+                                   (* scale center-scale p)))
+                                (:center-scales this)
+                                [w h]))
+      (with-translation [(/ w 2) (/ h 2)]
+        (with-scale [(:scale this)]
+          (with-rotation [(:rotation this)]
+            (with-translation [(- (/ w 2)) (- (/ h 2))]
+              (.draw (:drawable this) [w h]))))))))
 
 (defrecord Stack [layers]
   #^{:doc "A stack of drawables on top of one another."}
