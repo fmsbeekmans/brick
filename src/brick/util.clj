@@ -1,7 +1,7 @@
 (ns brick.util
   (:use quil.core))
 
-(defn name-dargs
+(defn named-args
   "Parses a seq of arguments into a hash-map"
   [args]
   (into {} (map vec (partition 2 args))))
