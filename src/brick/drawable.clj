@@ -86,6 +86,9 @@
     (reset! command-queue [])))
 
 (defn ->Bricklet
+  #^{:doc (str "Create a new bricklet with layers, exec-queue and opts.\n"
+               "use :init for setup in graphics environment.\n"
+               ":draw will be overridden in drawable->sketch.")}
   ([]
      (->Bricklet (atom []) (atom [])))
   ([target]
@@ -110,6 +113,6 @@
   (apply sketch (apply concat
                        (assoc bricklet
                          :setup #((or (:init bricklet)
-                                      (fn [_])) bricklet)
+                                      (fn [b])) bricklet)
                          :draw (fn []
                                  (.draw bricklet [(width) (height)]))))))
