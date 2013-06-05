@@ -103,14 +103,13 @@
           @v => (just (for  [x (range 3)
                              y (range 3)]
                         [x y]))))
+
+  ;; Deref test
   (let [v (atom [])
         s (d/->DerefMiddleware (atom (->Insert :dereffed v)))]
     (d/drawable->sketch s)
     (fact "The wrapped drawable is drawn"
-          @v => [:dereffed]))
-  
-  ;; Deref test
-  )
+          @v => [:dereffed])))
 
 (fact "drawable? on a non-drawable returns false."
   (d/drawable? 42) => FALSEY)
