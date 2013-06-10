@@ -1,5 +1,5 @@
-(defproject brick "0.0.1-SNAPSHOT"
-  :description "Cool new project to do things and stuff"
+(defproject jest/brick "0.0.1-SNAPSHOT"
+  :description "Tiling engine built on Quil"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [quil "1.6.0"]]
   :resource-paths ["resources/"]
