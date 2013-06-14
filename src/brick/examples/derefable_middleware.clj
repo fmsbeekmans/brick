@@ -6,22 +6,33 @@
   (:gen-class))
 
 ;;; These Vars should be abstracted by let bindings in production usage
-(def images (atom []))
-(def layers (atom []))
-(def commands (atom []))
-(def dict {:bricks 1 :bush-l 4 :bush-r 5})
+(def images
+  "A repository of loaded images." (atom []))
+(def layers
+  "The Drawable object that will be sketched." (atom []))
+(def commands
+  "A queue. Write 1-arity fn's here, param will be the drawable.
+Command will execute next draw cycle." (atom []))
+(def dict
+  "A lookup table for images." {:bricks 1 :bush-l 4 :bush-r 5})
 
-(def swap-img (atom []))
-(def proxy-middleware (atom []))
+(def swap-img
+  "This image will be replaced. Old image will remain
+visible unless it is completely painted over." (atom []))
+(def proxy-middleware
+  "The wrapper that allows the image to be swopped."
+  (atom []))
 
-(defn- images-init [old]
+(defn- images-init
   "Load the images that are used in the draw function."
+  [old]
   (vec (concat old
                (image/load-images
                 (load-image "resources/32x32.png") [32 32]))))
 
-(defn- target-init [old]
-  "Init"
+(defn- target-init
+  "Init swapable drawthingy!"
+  [_]
   (let [lookup #(@images (or (dict %)
                              %))]
     (swap! proxy-middleware (fn [_]
@@ -43,8 +54,9 @@
                     (drawable/->Image
                      (load-image "resources/32x32.png")))))
 
-(defn -main [& args]
+(defn -main
   "Launch the sketch"
+   [& _]
   (let [br (drawable/->Bricklet (atom layers) commands
                              :init init ;point to the init fn before
                                         ;the drawing starts.
@@ -53,6 +65,6 @@
         br-sketch (drawable/drawable->sketch! br)]
     (Thread/sleep 2000)
     (swap! commands conj
-           (fn [bricklet]
+           (fn [_]
              (swap! (:target-drawable @proxy-middleware)
                     conj @swap-img)))))

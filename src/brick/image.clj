@@ -1,6 +1,6 @@
 (ns brick.image
   "Helper functions for things to do with PImages."
-  (:use quil.core)
+  (:use [quil.core :only [load-image sketch]])
   (:require [brick.drawable :as draw])
   (:import [brick.drawable Image]))
 
@@ -16,6 +16,7 @@ them in a vector."
     (vec indexed-tiles)))
 
 (defmacro in-draw-context
+  "Execute in draw context and return result synchronously."
   [expr]
   `(let [p-expr# (promise)]
      (sketch :target :none
@@ -24,11 +25,14 @@ them in a vector."
      @p-expr#))
 
 (defn path->PImage
+  "Load the image at path into a PImage."
  [path]
  (in-draw-context (load-image path)))
 
 ;;TODO resource-image should return a record containing a dictionary
 ;;key, rather than a PImage. This makes the record comparable and
 ;;comparable is good.
-(defn resource-image [path]
+(defn resource-image
+  "Load image from resources into Image Drawable."
+  [path]
   (draw/->Image (path->PImage (clojure.java.io/resource path))))

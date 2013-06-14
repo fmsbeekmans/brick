@@ -1,10 +1,11 @@
 (ns brick.drawable
   "Everything that can be drawn and their helper functions."
-  (:use quil.core
-        brick.util))
+  (:use [brick.util :only [with-scale]])
+  (:require [quil.core :as q]))
 
-(defn- ranges [n pixels]
+(defn- ranges
   "Return a list of [offset size] so that pixels is divided into n pieces."
+  [n pixels]
   (let [size (/ pixels n)]
     (vec
      (for [i (range n)]
@@ -27,10 +28,10 @@
   [img]
   Drawable
   (draw [this [w h]]
-    (image (:img this) 0 0 w h)))
+    (q/image (:img this) 0 0 w h)))
 
-(defn *-pi [n]
-  ""
+(defn *-pi "take a number, multiply it by pi."
+  [n]
   (* Math/PI n))
 
 (defrecord Floating
@@ -38,16 +39,16 @@
   [drawable center-scales scale rotation]
   Drawable
   (draw [this [w h]]
-    (with-translation (vec (map (fn [center-scale p]
+    (q/with-translation (vec (map (fn [center-scale p]
                                   (+
                                    (- (* 0.5 (:scale this) p ))
                                    (* scale center-scale p)))
                                 (:center-scales this)
                                 [w h]))
-      (with-translation [(/ w 2) (/ h 2)]
+      (q/with-translation [(/ w 2) (/ h 2)]
         (with-scale [(:scale this)]
-          (with-rotation [(:rotation this)]
-            (with-translation [(- (/ w 2)) (- (/ h 2))]
+          (q/with-rotation [(:rotation this)]
+            (q/with-translation [(- (/ w 2)) (- (/ h 2))]
               (.draw (:drawable this) [w h]))))))))
 
 (defrecord Stack [layers]
@@ -65,7 +66,7 @@
           v-ranges (ranges (:h this) h)]
       (doseq [x (range (:w this))
               y (range (:h this))]
-        (with-translation [(get-in h-ranges [x 0])
+        (q/with-translation [(get-in h-ranges [x 0])
                            (get-in v-ranges [y 0])]
           (.draw ((:grid this) [x y])
                  [(get-in h-ranges [x 1])
@@ -86,9 +87,9 @@
     (reset! command-queue [])))
 
 (defn ->Bricklet
-  #^{:doc (str "Create a new bricklet with layers, exec-queue and opts.\n"
-               "use :init for setup in graphics environment.\n"
-               ":draw will be overridden in drawable->sketch.")}
+  "Create a new bricklet with layers, exec-queue and opts.
+use :init for setup in graphics environment.
+:draw will be overridden in drawable->sketch."
   [target command-queue & opts]
   (let [br (Bricklet. target command-queue)
         opts-map (apply hash-map opts)
@@ -106,9 +107,9 @@
 (defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
   [bricklet]
-  (apply sketch (apply concat
+  (apply q/sketch (apply concat
                        (assoc bricklet
                          :setup #((or (:init bricklet)
-                                      (fn [b])) bricklet)
+                                      (fn [_])) bricklet)
                          :draw (fn []
-                                 (.draw bricklet [(width) (height)]))))))
+                                 (.draw bricklet [(q/width) (q/height)]))))))

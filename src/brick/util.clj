@@ -1,16 +1,17 @@
 (ns brick.util
   "Utility functions for brick."
-  (:use quil.core))
+  (:require [quil.core :as q]))
 
 (defn named-args
   "Parses a seq of arguments into a hash-map"
   [args]
   (into {} (map vec (partition 2 args))))
 
-(defmacro with-scale [scale-vector & body]
+(defmacro with-scale
   "By tylergreen"
+  [scale-vector & body]
   `(let [tr# ~scale-vector]
-     (push-matrix)
-     (apply scale tr#)
+     (q/push-matrix)
+     (apply q/scale tr#)
      ~@body
-     (pop-matrix)))
+     (q/pop-matrix)))

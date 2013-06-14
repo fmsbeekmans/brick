@@ -1,7 +1,7 @@
 (ns brick.debug
   "A visual debugger. Add derefables, their derefed
 string value will be printed."
-  (:use [quil.core])
+  (:use [quil.core :only [text rect fill stroke push-style pop-style]])
   (:require [brick.drawable :as drawable]))
 
 (defprotocol HUDDebug
@@ -10,8 +10,9 @@ string value will be printed."
   (add-line [_ text derefable] "Add some extra information to the debugger.")
   (remove-line [_ derefable] "Remove a line from the debugger."))
 
-(defn simple-dbg []
+(defn simple-dbg
   "Create a new simple debugger"
+  []
   (let [visible? (atom false)
         lines (atom {})]
     (reify
