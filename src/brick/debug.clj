@@ -15,8 +15,7 @@
     (reify
       drawable/Drawable
       (drawable/draw [_ [_ _]]
-        (if @visible?
-          (do
+        (when @visible?
             (push-style)
             (doall (map
                     (fn [[d t] i]
@@ -26,7 +25,7 @@
                       (fill 255)
                       (text (str t ": " (pr-str @d)) 20 (+ 20 (* 20 i))))
                     @lines (iterate inc 0)))
-            (pop-style))))
+            (pop-style)))
       HUDDebug
       (toggle [_]
         (swap! visible? not))
