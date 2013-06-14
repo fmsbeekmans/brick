@@ -39,6 +39,6 @@
                              :size [500 500]
                              :title "Let there be title!"))
   (def br-sketch (drawable/drawable->sketch br))
-  (. Thread sleep 2000)
+  (Thread/sleep 2000)
   (swap! commands conj (fn [bricklet]
                          (swap! (:target-drawable @proxy-middleware) conj @swap-img))))
