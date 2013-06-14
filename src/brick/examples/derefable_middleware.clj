@@ -17,14 +17,16 @@
 (defn- images-init [old]
   "Load the images that are used in the draw function."
   (vec (concat old
-               (image/load-images (load-image "resources/32x32.png") [32 32]))))
+               (image/load-images
+                (load-image "resources/32x32.png") [32 32]))))
 
 (defn- target-init [old]
   "Init"
   (let [lookup #(@images (or (dict %)
                              %))]
     (swap! proxy-middleware (fn [_]
-                              (drawable/->DerefMiddleware (atom (lookup 7)))))
+                              (drawable/->DerefMiddleware
+                               (atom (lookup 7)))))
     @proxy-middleware))
 
 ;; All the resources need to be loaded in a quil environment.
@@ -38,16 +40,19 @@
   (swap! images images-init)
   (swap! (:target-drawable bricklet) target-init)
   (swap! swap-img (fn [_]
-                    (drawable/->Image (load-image "resources/32x32.png")))))
+                    (drawable/->Image
+                     (load-image "resources/32x32.png")))))
 
 (defn -main [& args]
   "Launch the sketch"
-  (def br (drawable/->Bricklet (atom layers) commands
+  (let [br (drawable/->Bricklet (atom layers) commands
                              :init init ;point to the init fn before
                                         ;the drawing starts.
                              :size [500 500]
-                             :title "Let there be title!"))
-  (def br-sketch (drawable/drawable->sketch! br))
-  (Thread/sleep 2000)
-  (swap! commands conj (fn [bricklet]
-                         (swap! (:target-drawable @proxy-middleware) conj @swap-img))))
+                             :title "Let there be title!")
+        br-sketch (drawable/drawable->sketch! br)]
+    (Thread/sleep 2000)
+    (swap! commands conj
+           (fn [bricklet]
+             (swap! (:target-drawable @proxy-middleware)
+                    conj @swap-img)))))

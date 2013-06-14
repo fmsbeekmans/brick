@@ -47,8 +47,8 @@
 
 (defn -main [& args]
   "Start the demo!"
-  (def br (drawable/->Bricklet layers commands
+  (let [br (drawable/->Bricklet layers commands
                                :init init
                                :size [500 500]
-                               :title "Let there be title!"))
-  (drawable/drawable->sketch! br))
+                               :title "Let there be title!")]
+    (drawable/drawable->sketch! br)))

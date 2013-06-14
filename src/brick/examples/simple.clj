@@ -14,7 +14,8 @@
 (defn- images-init [old]
   "Prepare the images used in the sketch."
   (vec (concat old
-               (image/load-images (load-image "resources/32x32.png") [32 32]))))
+               (image/load-images
+                (load-image "resources/32x32.png") [32 32]))))
 
 (defn- target-init [old]
   "The target of the bricklet, initialize what will be shown."
@@ -37,9 +38,8 @@
 ;composieties daarvan initializeren
 
 (defn -main [& args]
-
-  (def br (drawable/->Bricklet layers commands
+  (let [br (drawable/->Bricklet layers commands
                                :init init
                                :size [500 500]
-                               :title "Let there be title!"))
-  (drawable/drawable->sketch! br))
+                               :title "Let there be title!")]
+    (drawable/drawable->sketch! br)))

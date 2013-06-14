@@ -21,11 +21,13 @@
   (println )
   (let [lookup #(@images (or (dict %)
                              %))]
-    (drawable/->Grid 2 1
-                     {[0 0] (drawable/->Image (load-image "colors.png"))
-                      [1 0] (drawable/->Stack [(lookup :bush-l)
-                                               (drawable/->Grid 1 2 {[0 0] (drawable/->Nothing)
-                                                                     [0 1] (lookup 7)})])})))
+    (drawable/->Grid
+     2
+     1
+     {[0 0] (drawable/->Image (load-image "colors.png"))
+      [1 0] (drawable/->Stack [(lookup :bush-l)
+                               (drawable/->Grid 1 2 {[0 0] (drawable/->Nothing)
+                                                     [0 1] (lookup 7)})])})))
 
 (defn- init
   "Prepare a bricklet. This includes initializing tiles and layers."
@@ -39,8 +41,8 @@
   (swap! (:command-queue bricklet) conj (fn [_] (background 50 50 100))))
 
 (defn -main [& args]
-  (def br (drawable/->Bricklet layers commands
-                               :init init
-                               :size [500 500]
-                               :title "Let there be title!"))
-  (drawable/drawable->sketch! br))
+  (let [br (drawable/->Bricklet layers commands
+                                 :init init
+                                 :size [500 500]
+                                 :title "Let there be title!")]
+    (drawable/drawable->sketch! br)))
