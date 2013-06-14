@@ -1,4 +1,4 @@
-(defproject jest/brick "0.0.1-SNAPSHOT"
+(defproject jest/brick "0.1.0"
   :description "Tiling engine built on Quil"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [quil "1.6.0"]]
