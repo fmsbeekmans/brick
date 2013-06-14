@@ -30,16 +30,20 @@
                (first (first r)) => 0)))
 
 (fact "drawable->sketch has setup and draw fns"
-      (with-redefs [q/sketch (fn [& args]
-                               (let [arg-map (named-args args)]
-                                 (fact
-                                  "Contains setup fn"
-                                  arg-map => (contains {:setup fn?})
-                                  ((arg-map :setup) nil) => (throws clojure.lang.ArityException))
-                                 (fact
-                                  "Contains draw fn"
-                                  arg-map => (contains {:draw fn?})
-                                  ((arg-map :draw) nil) => (throws clojure.lang.ArityException))))]
+  (with-redefs [q/sketch (fn [& args]
+                           (let [arg-map (named-args args)]
+                             (fact
+                              "Contains setup fn"
+                              arg-map => (contains {:setup fn?})
+                              ((arg-map :setup) nil)
+                                => (throws clojure.lang.ArityException)
+                              ((arg-map :setup)))
+                             (fact
+                              "Contains draw fn"
+                              arg-map
+                                => (contains {:draw fn?})
+                              ((arg-map :draw) nil)
+                                => (throws clojure.lang.ArityException))))]
         (d/drawable->sketch (d/->Nothing))))
 
 (fact "drawable->sketch uses :init"
@@ -54,14 +58,15 @@
 (with-redefs [q/sketch (fn [& args]
                          (let [arg-map (named-args args)]
                            ((:init arg-map))))]
-  (d/drawable->sketch (d/->Bricklet (atom [])
-                                    (atom [])
-                                    :init (fn []
-                                            (fact "drawable->sketch uses :init"
-                                              anything => anything))
-                                    :draw (fn []
-                                            (fact "drawable->sketch overrides :draw"
-                                              true => falsey)))))
+  (d/drawable->sketch
+   (d/->Bricklet (atom [])
+                 (atom [])
+                 :init (fn []
+                         (fact "drawable->sketch uses :init"
+                               anything => anything))
+                 :draw (fn []
+                         (fact "drawable->sketch overrides :draw"
+                               true => falsey)))))
 
 (fact "number to radials"
   (d/rad 1) => Math/PI
@@ -73,43 +78,83 @@
       (swap! (:into this) (fn [old]
                             (conj old (:insert this))))))
 
-(with-redefs [q/with-translation (fn [tr body]
-                                   (do body))
-              q/push-matrix (fn [])
-              q/pop-matrix (fn [])
-              q/translate (fn [& _])
-              q/width (fn [] 10)
-              q/height (fn [] 10)
-              q/sketch (fn [& args]
-                         (let [arg-map (named-args args)]
-                           ((:draw arg-map))))]
-  ;; Stack test
-  (let [v (atom [])
-        s (d/->Stack (vec (for [i (range 4)]
-                            (->Insert i v))))]
-    (d/drawable->sketch s)
-    (fact "All layers are drawn"
-          (count @v) => 4)
-    (fact "Layers are drawn in order"
-          @v => [0 1 2 3]))
+(fact "image"
+  (with-redefs [quil.core/width (fn [] 100)
+                quil.core/height (fn [] 100)
+                quil.core/image (fn [img x y h w]
+                                  (fact "Image gets correct paramers"
+                                    img => :img
+                                    x => 0
+                                    y => 0
+                                    h => 100
+                                    w => 100))
+                quil.core/sketch (fn [& args]
+                                   (let [arg-map (named-args args)]
+                                     ((:draw arg-map))))]
+    (d/drawable->sketch (d/->Image :img))))
 
-  ;; Grid Test
-  (let [v (atom [])
-        s (d/->Grid 3 3 (into {} (for [x (range 3)
-                                       y (range 3)]
-                                   [[x y] (->Insert [x y] v)])))]
-    (d/drawable->sketch s)
-    (fact "all tiles are drawn"
-          @v => (just (for  [x (range 3)
-                             y (range 3)]
-                        [x y]))))
+(fact "Floating"
 
-  ;; Deref test
-  (let [v (atom [])
-        s (d/->DerefMiddleware (atom (->Insert :dereffed v)))]
-    (d/drawable->sketch s)
-    (fact "The wrapped drawable is drawn"
-          @v => [:dereffed])))
+ (let [translates (atom [])
+       scales (atom [])]
+   (with-redefs [quil.core/width (fn [] 100)
+                 quil.core/height (fn [] 100)
+                 quil.core/with-translation (fn
+                                              #^{:macro true}
+                                              [translation _]
+                                              (swap! translates conj translation))
+                 quil.core/with-rotation (fn
+                                           #^{:macro true}
+                                           [& rotation]
+                                           (fact "Correct rotation parameters"
+                                             rotation => '([2] [[-50 -50]])))
+                 brick.util/with-scale (fn
+                                         #^{:macro true}
+                                         [& _]
+                                         (println "scale" _))
+                 quil.core/image (fn [img x y h w]
+                                   (fact "Image gets correct paramers"
+                                     img => :img
+                                     x => 0
+                                     y => 0
+                                     h => 100
+                                     w => 100))
+                 quil.core/push-matrix (fn [])
+                 quil.core/pop-matrix (fn [])
+                 quil.core/translate (fn [& _])
+                 quil.core/scale (fn [& _])
+                 quil.core/rotate (fn [& _])
+                 quil.core/sketch (fn [& args]
+                                    (let [arg-map (named-args args)]
+                                      ((:draw arg-map))))]
+     (d/drawable->sketch (d/->Floating (d/->Image :img) [0.5 0.1] 0.01 2))
+     @translates => [[-50 -50]
+                    [50 50]
+                    [0.0 -0.4]])))
+
+(fact "Derefmiddleware")
+
+(fact "Execution queue facts."
+  (with-redefs [quil.core/width (fn [] 100)
+                quil.core/height (fn [] 100)
+                quil.core/sketch (fn [& args]
+                                   (let [arg-map (named-args args)]
+                                     (defn step []
+                                       ((:draw arg-map)))))]
+    (let [queue (atom [])
+          sink (atom [])
+          br (d/->Bricklet (atom (->Insert :draw sink))
+                           queue)]
+      (fact "Execution queue is processed after every draw.")
+      (d/drawable->sketch br)
+      (swap! queue conj (fn [_]
+                          (swap! sink conj :first-command)))
+      (step)
+      (swap! queue conj (fn [_]
+                          (swap! sink conj :second-command)))
+      (step)
+      @sink => [:draw :first-command :draw :second-command])))
+
 
 (fact "drawable? on a non-drawable returns false."
   (d/drawable? 42) => FALSEY)

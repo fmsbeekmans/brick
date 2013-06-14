@@ -36,8 +36,6 @@
   [drawable center-scales scale rotation]
   Drawable
   (draw [this [w h]]
-    ;[x] eerst midden naar 0
-    ;[ ] dan transleren.
     (with-translation (vec (map (fn [center-scale p]
                                   (+
                                    (- (* 0.5 (:scale this) p ))
@@ -72,7 +70,7 @@
                   (get-in v-ranges [y 1])]))))))
 
 (defrecord Nothing []
-  #^{:dow "A placeholder for an empty (/transparant) space."}
+  #^{:doc "A placeholder for an empty (/transparant) space."}
   Drawable
   (draw [_ _]))
 
@@ -89,18 +87,14 @@
   #^{:doc (str "Create a new bricklet with layers, exec-queue and opts.\n"
                "use :init for setup in graphics environment.\n"
                ":draw will be overridden in drawable->sketch.")}
-  ([]
-     (->Bricklet (atom []) (atom [])))
-  ([target]
-     (->Bricklet target (atom [])))
-  ([target command-queue & opts]
-     (let [br (Bricklet. target command-queue)
-           opts-map (apply hash-map opts)
-           params {:size [100 100]
-                   :title "No title"
-                   :images (atom [])}
-           with-setup (merge params {:setup (:init params)})]
-       (apply (partial assoc br) (apply concat (merge params opts-map br))))))
+  [target command-queue & opts]
+  (let [br (Bricklet. target command-queue)
+        opts-map (apply hash-map opts)
+        params {:size [100 100]
+                :title "No title"
+                :images (atom [])}
+        with-setup (merge params {:setup (:init params)})]
+    (apply (partial assoc br) (apply concat (merge params opts-map br)))))
 
 (defrecord DerefMiddleware [target-drawable]
   Drawable
