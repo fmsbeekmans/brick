@@ -4,6 +4,7 @@
                  [quil "1.6.0"]]
   :resource-paths ["resources/"]
   :profiles {:dev {:plugins [[lein-midje "3.0.0"]
+                             [codox "0.6.4"]
                              [lein-bikeshed "0.1.3"]
                              [jonase/eastwood "0.0.2"]
                              [lein-kibit "0.0.8"]
