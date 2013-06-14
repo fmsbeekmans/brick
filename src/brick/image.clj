@@ -1,9 +1,11 @@
 (ns brick.image
+  "Helper functions for things to do with PImages."
   (:use quil.core)
   (:require [brick.drawable :as draw])
   (:import [brick.drawable Image]))
 
 (defn load-images
+  "Cut a source image up into pieces of tile-w by tile-h and put them in a vector."
   [source-image [tile-w tile-h]]
   (let [n-tiles (/ (.width source-image) tile-w)
         indexed-tiles
@@ -23,16 +25,6 @@
 (defn path->PImage
  [path]
  (in-draw-context (load-image path)))
-
-(defmacro get-image-in
-  "Get an image from the bricklet's dictionary from the bricklet's image library."
-  [bricklet & path]
-  `(nth @(:images ~bricklet)
-        (dictionary (:dictionary ~bricklet) ~@path)))
-
-(defn dictionary [map key]
-  (or (map key)
-      key))
 
 ;;TODO resource-image should return a record containing a dictionary key, rather than a PImage. This makes the record comparable and comparable is good.
 (defn resource-image [path]

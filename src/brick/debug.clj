@@ -1,4 +1,6 @@
 (ns brick.debug
+  "A visual debugger. Add derefables, their derefed
+string value will be printed."
   (:use [quil.core])
   (:require [brick.drawable :as drawable]))
 

@@ -1,4 +1,5 @@
 (ns brick.examples.drawable
+  "example demonstrating most drawable's."
   (:use [quil.core :exclude [size]])
   (:require [brick.drawable :as drawable]
             [brick.image :as image])
@@ -10,12 +11,14 @@
 (def commands (atom []))
 (def dict {:bricks 1 :bush-l 4 :bush-r 5})
 
-(defn- images-init [old]
+(defn- images-init
+  "Load the images that will be needed."
+  [old]
   (vec (concat old
                (image/load-images (load-image "resources/32x32.png") [32 32]))))
 
-(defn- layers-init [old]
-  (let [lookup #(@images (image/dictionary dict %))]
+(defn- target-init [old]
+  (let [lookup #(@images (% dict %))]
     (drawable/->Grid 2 1
                      {[0 0] (drawable/->Image (load-image "colors.png"))
                       [1 0] (drawable/->Stack [(lookup :bush-l)
@@ -28,17 +31,14 @@
   (frame-rate 2)
   (background 0)
   (swap! images images-init)
-  (swap! (:target-drawable bricklet) layers-init))
+  (swap! (:target-drawable bricklet) target-init))
 
 (defn color-bg [bricklet]
   (swap! (:command-queue bricklet) conj (fn [_] (background 50 50 100))))
-
-;een init maken voor de target-drawable, kan alleen Nothing en
-;composieties daarvan initializeren
 
 (defn -main [& args]
   (def br (drawable/->Bricklet layers commands
                                :init init
                                :size [500 500]
                                :title "Let there be title!"))
-  (drawable/drawable->sketch br))
+  (drawable/drawable->sketch! br))

@@ -1,4 +1,5 @@
 (ns brick.examples.derefable-middleware
+  "Example demonstrating a wrapper."
   (:use [quil.core :exclude [size]])
   (:require [brick.drawable :as drawable]
             [brick.image :as image])
@@ -14,14 +15,19 @@
 (def proxy-middleware (atom []))
 
 (defn- images-init [old]
+  "Load the images that are used in the draw function."
   (vec (concat old
                (image/load-images (load-image "resources/32x32.png") [32 32]))))
 
-(defn- layers-init [old]
-  (let [lookup #(@images (image/dictionary dict %))]
+(defn- target-init [old]
+  "Init"
+  (let [lookup #(@images (%  dict %))]
     (swap! proxy-middleware (fn [_]
                               (drawable/->DerefMiddleware (atom (lookup 7)))))
     @proxy-middleware))
+
+;; All the resources need to be loaded in a quil environment.
+;; This can be done by attaching an init k-v pair.
 
 (defn- init
   "Prepare a bricklet. This includes initializing tiles and layers."
@@ -29,16 +35,18 @@
   (frame-rate 2)
   (background 0)
   (swap! images images-init)
-  (swap! (:target-drawable bricklet) layers-init)
+  (swap! (:target-drawable bricklet) target-init)
   (swap! swap-img (fn [_]
                     (drawable/->Image (load-image "resources/32x32.png")))))
 
 (defn -main [& args]
+  "Launch the sketch"
   (def br (drawable/->Bricklet (atom layers) commands
-                             :init init
+                             :init init ;point to the init fn before
+                                        ;the drawing starts.
                              :size [500 500]
                              :title "Let there be title!"))
-  (def br-sketch (drawable/drawable->sketch br))
+  (def br-sketch (drawable/drawable->sketch! br))
   (Thread/sleep 2000)
   (swap! commands conj (fn [bricklet]
                          (swap! (:target-drawable @proxy-middleware) conj @swap-img))))

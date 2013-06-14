@@ -1,4 +1,5 @@
 (ns brick.util
+  "Utility functions for brick."
   (:use quil.core))
 
 (defn named-args

@@ -1,6 +1,5 @@
 (ns brick.drawable-test
-  (:use midje.sweet
-        conjure.core)
+  (:use midje.sweet)
   (:use [brick.image :only [load-images]])
   (:use [brick.util])
   (:require [brick.drawable :as d])
@@ -44,13 +43,13 @@
                                 => (contains {:draw fn?})
                               ((arg-map :draw) nil)
                                 => (throws clojure.lang.ArityException))))]
-        (d/drawable->sketch (d/->Nothing))))
+        (d/drawable->sketch! (d/->Nothing))))
 
 (fact "drawable->sketch uses :init"
       (with-redefs [q/sketch (fn [& args]
                                (let [arg-map (named-args args)]
                                  ((:init arg-map))))]
-        (d/drawable->sketch (d/->Bricklet (atom [])
+        (d/drawable->sketch! (d/->Bricklet (atom [])
                                           (atom [])
                                           :init (fn []
                                                   anything => anything)))))
@@ -58,7 +57,7 @@
 (with-redefs [q/sketch (fn [& args]
                          (let [arg-map (named-args args)]
                            ((:init arg-map))))]
-  (d/drawable->sketch
+  (d/drawable->sketch!
    (d/->Bricklet (atom [])
                  (atom [])
                  :init (fn []
@@ -69,8 +68,8 @@
                                true => falsey)))))
 
 (fact "number to radials"
-  (d/rad 1) => Math/PI
-  (d/rad 2) => (* 2 Math/PI))
+  (d/*-pi 1) => Math/PI
+  (d/*-pi 2) => (* 2 Math/PI))
 
 (defrecord Insert [insert into]
     Drawable
@@ -79,8 +78,10 @@
                             (conj old (:insert this))))))
 
 (fact "image"
-  (with-redefs [quil.core/width (fn [] 100)
-                quil.core/height (fn [] 100)
+  (with-redefs [quil.core/width (fn []
+                                  100)
+                quil.core/height (fn []
+                                   100)
                 quil.core/image (fn [img x y h w]
                                   (fact "Image gets correct paramers"
                                     img => :img
@@ -91,27 +92,21 @@
                 quil.core/sketch (fn [& args]
                                    (let [arg-map (named-args args)]
                                      ((:draw arg-map))))]
-    (d/drawable->sketch (d/->Image :img))))
+    (d/drawable->sketch! (d/->Image :img))))
 
 (fact "Floating"
-
  (let [translates (atom [])
        scales (atom [])]
-   (with-redefs [quil.core/width (fn [] 100)
-                 quil.core/height (fn [] 100)
-                 quil.core/with-translation (fn
-                                              #^{:macro true}
-                                              [translation _]
-                                              (swap! translates conj translation))
-                 quil.core/with-rotation (fn
-                                           #^{:macro true}
-                                           [& rotation]
-                                           (fact "Correct rotation parameters"
-                                             rotation => '([2] [[-50 -50]])))
+   (with-redefs [quil.core/width (fn []
+                                   100)
+                 quil.core/height (fn []
+                                    100)
+                 quil.core/push-matrix (fn [])
+                 quil.core/pop-matrix (fn [])
                  brick.util/with-scale (fn
                                          #^{:macro true}
-                                         [& _]
-                                         (println "scale" _))
+                                         [scale _]
+                                         scale => 0.01)
                  quil.core/image (fn [img x y h w]
                                    (fact "Image gets correct paramers"
                                      img => :img
@@ -119,20 +114,74 @@
                                      y => 0
                                      h => 100
                                      w => 100))
-                 quil.core/push-matrix (fn [])
-                 quil.core/pop-matrix (fn [])
-                 quil.core/translate (fn [& _])
-                 quil.core/scale (fn [& _])
-                 quil.core/rotate (fn [& _])
+                 quil.core/translate (fn [translation]
+                                       (swap! translates conj translation))
+                 quil.core/scale (fn [s]
+                                   (fact "Image is drawn in the correct scale"
+                                     s => 0.01))
+                 quil.core/rotate (fn [r]
+                                    (fact "Correct rotation parameters"
+                                      r => 2))
                  quil.core/sketch (fn [& args]
                                     (let [arg-map (named-args args)]
                                       ((:draw arg-map))))]
-     (d/drawable->sketch (d/->Floating (d/->Image :img) [0.5 0.1] 0.01 2))
-     @translates => [[-50 -50]
+     (d/drawable->sketch! (d/->Floating (d/->Image :img) [0.5 0.1] 0.01 2))
+     @translates => [[0.0 -0.4]
                     [50 50]
-                    [0.0 -0.4]])))
+                    [-50 -50]])))
 
-(fact "Derefmiddleware")
+(fact "Derefmiddleware"
+  (let [sink (atom [])]
+    (with-redefs [quil.core/width (fn []
+                                    100)
+                  quil.core/height (fn [])
+                  quil.core/sketch (fn [& args]
+                                     (let [arg-map (named-args args)]
+                                       ((:draw arg-map))))]
+      (d/drawable->sketch! (d/->DerefMiddleware (atom (->Insert :target sink))))
+      @sink => [:target])))
+
+(fact "Stack"
+  (let [sink (atom [])]
+    (with-redefs [quil.core/width (fn []
+                                    100)
+                  quil.core/height (fn [])
+                  quil.core/sketch (fn [& args]
+                                     (let [arg-map (named-args args)]
+                                       ((:draw arg-map))))]
+      (d/drawable->sketch! (d/->Stack [(->Insert :first sink)
+                                    (->Insert :second sink)]))
+      @sink => [:first :second])))
+
+(fact "Grid"
+  (let [sink (atom [])
+        translations (atom [])]
+    (with-redefs
+      [quil.core/width (fn []
+                         100)
+       quil.core/height (fn []
+                          100)
+       quil.core/push-matrix (fn [])
+       quil.core/pop-matrix (fn [])
+       quil.core/translate (fn [translate]
+                             (fact "Pieces are translated to the correct point."
+                               (swap! translations conj translate)))
+
+       quil.core/sketch (fn [& args]
+                          (let [arg-map (named-args args)]
+                            ((:draw arg-map))))]
+      (d/drawable->sketch! (d/->Grid 2 2 {[0 0] (->Insert [0 0] sink)
+                                          [0 1] (->Insert [0 1] sink)
+                                          [1 0] (->Insert [1 0] sink)
+                                          [1 1] (->Insert [1 1] sink)}))
+      @sink => [[0 0]
+                [0 1]
+                [1 0]
+                [1 1]]
+      @translations => [[0 0]
+                        [0 50]
+                        [50 0]
+                        [50 50]])))
 
 (fact "Execution queue facts."
   (with-redefs [quil.core/width (fn [] 100)
@@ -146,7 +195,7 @@
           br (d/->Bricklet (atom (->Insert :draw sink))
                            queue)]
       (fact "Execution queue is processed after every draw.")
-      (d/drawable->sketch br)
+      (d/drawable->sketch! br)
       (swap! queue conj (fn [_]
                           (swap! sink conj :first-command)))
       (step)
@@ -155,6 +204,12 @@
       (step)
       @sink => [:draw :first-command :draw :second-command])))
 
+(fact "Bricklet draws"
+  (with-redefs [quil.core/width (fn [] 100)
+                quil.core/height (fn [] 100)
+                quil.core/sketch (fn [& args]
+                                   (let [arg-map (named-args args)]
+                                     ((:draw arg-map))))]))
 
 (fact "drawable? on a non-drawable returns false."
   (d/drawable? 42) => FALSEY)

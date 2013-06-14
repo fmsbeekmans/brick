@@ -1,4 +1,5 @@
 (ns brick.drawable
+  "Everything that can be drawn and their helper functions."
   (:use quil.core
         brick.util))
 
@@ -28,7 +29,8 @@
   (draw [this [w h]]
     (image (:img this) 0 0 w h)))
 
-(defn rad [n]
+(defn *-pi [n]
+  ""
   (* Math/PI n))
 
 (defrecord Floating
@@ -101,7 +103,7 @@
   (draw [this [w h]]
     (.draw @(:target-drawable this) [w h])))
 
-(defn drawable->sketch
+(defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
   [bricklet]
   (apply sketch (apply concat
