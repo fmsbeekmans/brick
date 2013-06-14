@@ -21,7 +21,8 @@
 
 (defn- target-init [old]
   "Init"
-  (let [lookup #(@images (%  dict %))]
+  (let [lookup #(@images (or (dict %)
+                             %))]
     (swap! proxy-middleware (fn [_]
                               (drawable/->DerefMiddleware (atom (lookup 7)))))
     @proxy-middleware))

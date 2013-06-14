@@ -18,7 +18,9 @@
                (image/load-images (load-image "resources/32x32.png") [32 32]))))
 
 (defn- target-init [old]
-  (let [lookup #(@images (% dict %))]
+  (println )
+  (let [lookup #(@images (or (dict %)
+                             %))]
     (drawable/->Grid 2 1
                      {[0 0] (drawable/->Image (load-image "colors.png"))
                       [1 0] (drawable/->Stack [(lookup :bush-l)

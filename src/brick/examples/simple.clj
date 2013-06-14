@@ -18,7 +18,8 @@
 
 (defn- target-init [old]
   "The target of the bricklet, initialize what will be shown."
-  (let [lookup #(@images (% dict %))]
+  (let [lookup #(@images (or (dict %)
+                             %))]
     (drawable/->Image (load-image "colors.png"))))
 
 (defn- init

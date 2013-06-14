@@ -20,7 +20,8 @@
 (defn- target-init
   "Initialize the object to be drawn."
   [old]
-  (let [lookup #(@images (% dict %))]
+  (let [lookup #(@images (or (dict %)
+                             %))]
     (drawable/->Grid 16 9 (into {} (for [x (range 16)
                                          y (range 9)]
                                         [[x y]
