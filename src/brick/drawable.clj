@@ -28,6 +28,7 @@
   [img]
   Drawable
   (draw [this [w h]]
+    (println (pr-str (:img this)))
     (q/image (:img this) 0 0 w h)))
 
 (defn *-pi "take a number, multiply it by pi."
@@ -106,10 +107,10 @@ use :init for setup in graphics environment.
 
 (defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
-  [bricklet]
+  [drawable]
   (apply q/sketch (apply concat
-                       (assoc bricklet
-                         :setup #((or (:init bricklet)
-                                      (fn [_])) bricklet)
+                       (assoc drawable
+                         :setup #((or (:init drawable)
+                                      (fn [_])) drawable)
                          :draw (fn []
-                                 (.draw bricklet [(q/width) (q/height)]))))))
+                                 (.draw drawable [(q/width) (q/height)]))))))
