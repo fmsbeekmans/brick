@@ -28,7 +28,6 @@
   [img]
   Drawable
   (draw [this [w h]]
-    (println (pr-str (:img this)))
     (q/image (:img this) 0 0 w h)))
 
 (defn *-pi "take a number, multiply it by pi."
