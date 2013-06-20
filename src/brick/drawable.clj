@@ -3,7 +3,7 @@
   (:use [brick.util :only [with-scale]])
   (:require [quil.core :as q]))
 
-(defn- ranges
+(defn ranges
   "Return a list of [offset size] so that pixels is divided into n pieces."
   [n pixels]
   (let [size (/ pixels n)]
@@ -94,6 +94,7 @@ use :init for setup in graphics environment.
   (let [br (Bricklet. target command-queue)
         opts-map (apply hash-map opts)
         params {:size [100 100]
+                :framerate 10
                 :title "No title"
                 :images (atom [])}
         with-setup (merge params {:setup (:init params)})]
