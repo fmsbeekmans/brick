@@ -1,5 +1,8 @@
 (defproject jest/brick "0.1.1-SNAPSHOT"
   :description "Tiling engine built on Quil"
+  :url "http://www.github.com/fmsbeekmans/brick.git"
+  :license {:name "Eclipse Public License - v1.0"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [quil "1.6.0"]]
   :resource-paths ["resources/"]
