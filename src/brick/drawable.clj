@@ -40,11 +40,11 @@
   Drawable
   (draw [this [w h]]
     (q/with-translation (vec (map (fn [center-scale p]
-                                  (+
-                                   (- (* 0.5 (:scale this) p ))
-                                   (* scale center-scale p)))
-                                (:center-scales this)
-                                [w h]))
+                                    (+
+                                     (- (/ p 2))
+                                     (* p 2 center-scale)))
+                                  (:center-scales this)
+                                  [w h]))
       (q/with-translation [(/ w 2) (/ h 2)]
         (with-scale [(:scale this)]
           (q/with-rotation [(:rotation this)]
