@@ -113,4 +113,5 @@ use :init for setup in graphics environment.
                          :setup #((or (:init drawable)
                                       (fn [_])) drawable)
                          :draw (fn []
+                                 (q/background 255 255 255)
                                  (.draw drawable [(q/width) (q/height)]))))))
