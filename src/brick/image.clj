@@ -1,6 +1,6 @@
 (ns brick.image
   "Helper functions for things to do with PImages."
-  (:use [quil.core :only [load-image sketch]])
+  (:use [quil.core :only [load-image sketch exit no-loop]])
   (:require [brick.drawable :as draw])
   (:import [brick.drawable Image]))
 
@@ -21,7 +21,10 @@ them in a vector."
   `(let [p-expr# (promise)]
      (sketch :target :none
              :setup
-             (fn [] (deliver p-expr# ~expr)))
+             (fn []
+               (deliver p-expr# ~expr)
+               (no-loop)
+               (exit)))
      @p-expr#))
 
 (defn path->PImage
