@@ -110,7 +110,9 @@ use :init for setup in graphics environment.
   [drawable]
   (apply q/sketch (apply concat
                        (assoc drawable
-                         :setup #((or (:init drawable)
+                         :setup (fn []
+                                  (q/frame-rate 15)
+                                  (or (:init drawable)
                                       (fn [_])) drawable)
                          :draw (fn []
                                  (q/background 255 255 255)
