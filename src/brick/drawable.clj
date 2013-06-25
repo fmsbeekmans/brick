@@ -5,13 +5,16 @@
 
 (defn ranges
   "Return a list of [offset size] so that pixels is divided into n pieces."
-  [n pixels]
-  (let [size (/ pixels n)]
-    (vec
-     (for [i (range n)]
-       (let [start (int (Math/ceil (* i size)))
-             end (int (Math/ceil (* (inc i) size)))]
-         [start (- end start)])))))
+  ([n pixels offset]
+     (let [size (/ pixels n)]
+       (vec
+        (for [i (range n)]
+          (let [start (int (Math/ceil (* i size)))
+                 end (int (Math/ceil (* (inc i) size)))]
+            [(+ offset start)
+             (- end start)])))))
+  ([n pixels]
+     (ranges n pixels 0)))
 
 (defprotocol Drawable
   "Anything that can be drawn"
@@ -39,17 +42,27 @@
   [drawable center-scales scale rotation]
   Drawable
   (draw [this [w h]]
-    (q/with-translation (vec (map (fn [center-scale p]
-                                    (+
-                                     (- (/ p 2))
-                                     (* p 2 center-scale)))
+    (comment (q/with-translation (vec (map (fn [center-scale p]
+                                             (+
+                                              (- (/ p 2))
+                                              (* p 2 center-scale)))
+                                           (:center-scales this)
+                                           [w h]))
+               (q/with-translation [(/ w 2) (/ h 2)]
+                 (with-scale [(:scale this)]
+                   (q/with-rotation [(:rotation this)]
+                     (q/with-translation [(- (/ w 2)) (- (/ h 2))]
+                       (.draw (:drawable this) [w h])))))))
+
+    (q/with-translation (vec (map (fn [scale p]
+                                    (int (* scale p)))
                                   (:center-scales this)
                                   [w h]))
-      (q/with-translation [(/ w 2) (/ h 2)]
+      (q/with-rotation [(:rotation this)]
         (with-scale [(:scale this)]
-          (q/with-rotation [(:rotation this)]
-            (q/with-translation [(- (/ w 2)) (- (/ h 2))]
-              (.draw (:drawable this) [w h]))))))))
+          (q/with-translation [(- (* w 0.5))
+                               (- (* h 0.5))]
+            (.draw (:drawable this) [w h])))))))
 
 (defrecord Stack [layers]
   #^{:doc "A stack of drawables on top of one another."}
