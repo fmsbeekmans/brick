@@ -8,11 +8,11 @@
   "Cut a source image up into pieces of tile-w by tile-h and put
 them in a vector."
   [source-image [tile-w tile-h]]
-  (let [n-tiles (/ (.width source-image) tile-w)
+  (let [n-tiles (/ (.width ^processing.core.PImage source-image) tile-w)
         indexed-tiles
         (for [i (take n-tiles
                       (iterate (partial + tile-w) 0))]
-          (Image. (.get source-image i 0 tile-w tile-h)))]
+          (Image. (.get ^processing.core.PImage source-image i 0 tile-w tile-h)))]
     (vec indexed-tiles)))
 
 (defmacro in-draw-context
