@@ -84,7 +84,7 @@ into n pieces."
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (.draw ^brick.drawable.Drawable @target-drawable [w h])
+    (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
@@ -104,10 +104,11 @@ use :init for setup in graphics environment.
     (apply (partial assoc br) (apply concat (merge params opts-map br)))))
 
 (defrecord DerefMiddleware
-    [^brick.drawable.Drawable target-drawable]
+  [^brick.drawable.Drawable target-drawable]
   Drawable
   (draw [this [w h]]
-    (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])))
+    (.draw ^brick.drawable.Drawable
+           @(:target-drawable this) [w h])))
 
 (defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
@@ -121,3 +122,16 @@ use :init for setup in graphics environment.
                          :draw (fn []
                                  (q/background 255 255 255)
                                  (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
+
+(defrecord Border
+  [target border-w border-h]
+  Drawable
+  (draw
+    [this [w h]]
+    (let [border-w' (int (* (:border-w this) w))
+          border-h' (int (* (:border-h this) h))
+          w' (- w border-w' border-w')
+          h' (- h border-h' border-h')]
+      (q/with-translation [border-w' border-h']
+        (println (:target this))
+        (.draw (:target this) [w' h'])))))
