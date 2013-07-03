@@ -133,5 +133,4 @@ use :init for setup in graphics environment.
           w' (- w border-w' border-w')
           h' (- h border-h' border-h')]
       (q/with-translation [border-w' border-h']
-        (println (:target this))
         (.draw (:target this) [w' h'])))))
