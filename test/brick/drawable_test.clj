@@ -7,26 +7,25 @@
   (:import [brick.drawable Drawable]))
 
 (facts "ranges"
-       (let [r (@#'d/ranges 4 25)]
-         (fact "distance"
-               (doseq [[offset width] r]
-                 width => (roughly 25/4 1)))
-         (fact "overlap"
-
-               (loop [s 0
-                      i 0]
-                 s => (get-in r [i 0])
-                 (if-not (< (inc i) (count r))
-                   (do (+ (get-in r [3 1])
-                          s) => 25)
-                   (recur (+ s (get-in r [i 1]))
-                          (inc i)))))
-         (fact "end"
-               (apply + (last r)) => 25)
-         (fact "should be n partitions"
-               (count r) => 4)
-         (fact "start at 0"
-               (first (first r)) => 0)))
+  (let [r (@#'d/ranges 4 25)]
+    (fact "distance"
+      (doseq [[offset width] r]
+        width => (roughly 25/4 1)))
+    (fact "overlap"
+      (loop [s 0
+             i 0]
+        s => (get-in r [i 0])
+        (if-not (< (inc i) (count r))
+          (do (+ (get-in r [3 1])
+                 s) => 25)
+          (recur (+ s (get-in r [i 1]))
+                 (inc i)))))
+    (fact "end"
+      (apply + (last r)) => 25)
+    (fact "should be n partitions"
+      (count r) => 4)
+    (fact "start at 0"
+      (first (first r)) => 0)))
 
 (fact "drawable->sketch has setup and draw fns"
   (with-redefs [q/sketch (fn [& args]
@@ -126,9 +125,8 @@
                                     (let [arg-map (named-args args)]
                                       ((:draw arg-map))))]
      (d/drawable->sketch! (d/->Floating (d/->Image :img) [0.5 0.1] 0.01 2))
-     @translates => [[0.0 -0.4]
-                    [50 50]
-                    [-50 -50]])))
+     @translates => [[50 10]
+                     [-50.0 -50.0]])))
 
 (fact "Derefmiddleware"
   (let [sink (atom [])]

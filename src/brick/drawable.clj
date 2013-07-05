@@ -116,11 +116,11 @@ use :init for setup in graphics environment.
   (apply q/sketch (apply concat
                        (assoc drawable
                          :setup (fn []
-                                  (q/frame-rate 30)
+                                  ;(q/frame-rate 30)
                                   (or (:init drawable)
                                       (fn [_])) drawable)
                          :draw (fn []
-                                 (q/background 255 255 255)
+                                 ;(q/background 255 255 255)
                                  (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
 
 (defrecord Border
