@@ -40,7 +40,7 @@ into n pieces."
 
 (defrecord Floating
     #^{:doc "A wrapper for drawables to float a drawable."}
-  [^brick.drawable.Drawable drawable center-scales scale rotation]
+  [drawable center-scales scale rotation]
   Drawable
   (draw [this [w h]]
     (q/with-translation (vec (map (fn [scale p]
@@ -51,14 +51,14 @@ into n pieces."
         (with-scale [(:scale this)]
           (q/with-translation [(- (* w 0.5))
                                (- (* h 0.5))]
-            (.draw ^brick.drawable.Drawable (:drawable this) [w h])))))))
+            (.draw (:drawable this) [w h])))))))
 
 (defrecord Stack [layers]
   #^{:doc "A stack of drawables on top of one another."}
   Drawable
   (draw [this [w h]]
     (doseq [layer (:layers this)]
-      (.draw ^brick.drawable.Drawable layer [w h]))))
+      (.draw layer [w h]))))
 
 (defrecord Grid [w h grid]
   #^{:doc "A grid of drawables exactly side by side."}
@@ -70,7 +70,7 @@ into n pieces."
               y (range (:h this))]
         (q/with-translation [(get-in h-ranges [x 0])
                            (get-in v-ranges [y 0])]
-          (.draw ^brick.drawable.Drawable ((:grid this) [x y])
+          (.draw ((:grid this) [x y])
                  [(get-in h-ranges [x 1])
                   (get-in v-ranges [y 1])]))))))
 
@@ -84,7 +84,7 @@ into n pieces."
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])
+    (.draw @(:target-drawable this) [w h])
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
@@ -93,7 +93,7 @@ into n pieces."
   "Create a new bricklet with layers, exec-queue and opts.
 use :init for setup in graphics environment.
 :draw will be overridden in drawable->sketch."
-  [^brick.drawable.Drawable target command-queue & opts]
+  [target command-queue & opts]
   (let [br (Bricklet. target command-queue)
         opts-map (apply hash-map opts)
         params {:size [100 100]
@@ -104,15 +104,14 @@ use :init for setup in graphics environment.
     (apply (partial assoc br) (apply concat (merge params opts-map br)))))
 
 (defrecord DerefMiddleware
-  [^brick.drawable.Drawable target-drawable]
+  [target-drawable]
   Drawable
   (draw [this [w h]]
-    (.draw ^brick.drawable.Drawable
-           @(:target-drawable this) [w h])))
+    (.draw @(:target-drawable this) [w h])))
 
 (defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
-  [^brick.drawable.Drawable drawable]
+  [drawable]
   (apply q/sketch (apply concat
                        (assoc drawable
                          :setup (fn []
@@ -121,7 +120,7 @@ use :init for setup in graphics environment.
                                       (fn [_])) drawable)
                          :draw (fn []
                                  ;(q/background 255 255 255)
-                                 (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
+                                 (.draw drawable [(q/width) (q/height)]))))))
 
 (defrecord Border
   [target border-w border-h]
@@ -134,3 +133,31 @@ use :init for setup in graphics environment.
           h' (- h border-h' border-h')]
       (q/with-translation [border-w' border-h']
         (.draw (:target this) [w' h'])))))
+
+(defn square-borders-size
+  ([[screen-w screen-h] [w h]]
+     (square-borders-size [screen-w screen-h] [w h] [0 0]))
+  ([[screen-w screen-h] [w h] [min-border-w min-border-h]]
+     (let [w' (quot (- screen-w (* screen-w
+                                   min-border-w)) w)
+           h' (quot (- screen-h (* screen-h
+                                   min-border-h)) h)
+           d (min h' w')]
+       [(/ (* 0.5 (- screen-w (* w d)))
+           screen-w)
+        (/ (* 0.5 (- screen-h (* h d)))
+           screen-h)])))
+
+(defrecord SquareTiledGrid
+  [w h grid]
+  Drawable
+  (draw [this [w h]]
+    (.draw
+     (apply ->Border
+            (->Grid (:w this) (:h this) (:grid this))
+            (square-borders-size
+             [(q/width) (q/height)]
+             [(:w this) (:h this)]
+             [w h]))
+     [w h])))
+
