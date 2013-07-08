@@ -138,10 +138,8 @@ use :init for setup in graphics environment.
   ([[screen-w screen-h] [w h]]
      (square-borders-size [screen-w screen-h] [w h] [0 0]))
   ([[screen-w screen-h] [w h] [min-border-w min-border-h]]
-     (let [w' (quot (- screen-w (* screen-w
-                                   min-border-w)) w)
-           h' (quot (- screen-h (* screen-h
-                                   min-border-h)) h)
+     (let [w' (quot screen-w w)
+           h' (quot screen-h h)
            d (min h' w')]
        [(/ (* 0.5 (- screen-w (* w d)))
            screen-w)
