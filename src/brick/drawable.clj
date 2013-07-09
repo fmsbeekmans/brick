@@ -51,14 +51,14 @@ into n pieces."
         (with-scale [(:scale this)]
           (q/with-translation [(- (* w 0.5))
                                (- (* h 0.5))]
-            (.draw (:drawable this) [w h])))))))
+            (.draw ^brick.drawable.Drawable (:drawable this) [w h])))))))
 
 (defrecord Stack [layers]
   #^{:doc "A stack of drawables on top of one another."}
   Drawable
   (draw [this [w h]]
     (doseq [layer (:layers this)]
-      (.draw layer [w h]))))
+      (.draw ^brick.drawable.Drawable layer [w h]))))
 
 (defrecord Grid [w h grid]
   #^{:doc "A grid of drawables exactly side by side."}
@@ -70,7 +70,7 @@ into n pieces."
               y (range (:h this))]
         (q/with-translation [(get-in h-ranges [x 0])
                            (get-in v-ranges [y 0])]
-          (.draw ((:grid this) [x y])
+          (.draw ^brick.drawable.Drawable ((:grid this) [x y])
                  [(get-in h-ranges [x 1])
                   (get-in v-ranges [y 1])]))))))
 
@@ -84,7 +84,7 @@ into n pieces."
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
-    (.draw @(:target-drawable this) [w h])
+    (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])
     (doseq [command @command-queue]
       (command this))
     (reset! command-queue [])))
@@ -107,7 +107,7 @@ use :init for setup in graphics environment.
   [target-drawable]
   Drawable
   (draw [this [w h]]
-    (.draw @(:target-drawable this) [w h])))
+    (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])))
 
 (defn drawable->sketch!
   "Creates a sketch from a bricklet and quil options"
@@ -120,7 +120,7 @@ use :init for setup in graphics environment.
                                       (fn [_])) drawable)
                          :draw (fn []
                                  ;(q/background 255 255 255)
-                                 (.draw drawable [(q/width) (q/height)]))))))
+                                 (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
 
 (defrecord Border
   [target border-w border-h]
@@ -132,7 +132,7 @@ use :init for setup in graphics environment.
           w' (- w border-w' border-w')
           h' (- h border-h' border-h')]
       (q/with-translation [border-w' border-h']
-        (.draw (:target this) [w' h'])))))
+        (.draw ^brick.drawable.Drawable (:target this) [w' h'])))))
 
 (defn square-borders-size
   ([[screen-w screen-h] [w h]]
@@ -150,7 +150,7 @@ use :init for setup in graphics environment.
   [w h grid]
   Drawable
   (draw [this [w h]]
-    (.draw
+    (.draw ^brick.drawable.Drawable
      (apply ->Border
             (->Grid (:w this) (:h this) (:grid this))
             (square-borders-size
