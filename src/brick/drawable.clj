@@ -3,6 +3,8 @@
   (:use [brick.util :only [with-scale]])
   (:require [quil.core :as q]))
 
+(def min-borders [0.1 0.1])
+
 (defn ranges
   "Return a list of [offset size] so that pixels is divided
 into n pieces."
@@ -138,8 +140,10 @@ use :init for setup in graphics environment.
   ([[screen-w screen-h] [w h]]
      (square-borders-size [screen-w screen-h] [w h] [0 0]))
   ([[screen-w screen-h] [w h] [min-border-w min-border-h]]
-     (let [w' (quot screen-w w)
-           h' (quot screen-h h)
+     (let [screen-w' (- screen-w (* 0.5 min-border-w screen-w))
+           screen-h' (- screen-h (* 0.5 min-border-h screen-h))
+           w' (quot screen-w' w)
+           h' (quot screen-h' h)
            d (min h' w')]
        [(/ (* 0.5 (- screen-w (* w d)))
            screen-w)
@@ -147,7 +151,7 @@ use :init for setup in graphics environment.
            screen-h)])))
 
 (defrecord SquareTiledGrid
-  [w h grid]
+  [w h grid min-border-w min-border-h]
   Drawable
   (draw [this [w h]]
     (.draw ^brick.drawable.Drawable
@@ -156,6 +160,7 @@ use :init for setup in graphics environment.
             (square-borders-size
              [(q/width) (q/height)]
              [(:w this) (:h this)]
-             [w h]))
+             [(:min-border-w this)
+              (:min-border-h this)]))
      [w h])))
 
