@@ -116,10 +116,8 @@ use :init for setup in graphics environment.
   [drawable]
   (apply q/sketch (apply concat
                        (assoc drawable
-                         :setup (fn []
-                                  ;(q/frame-rate 30)
-                                  (or (:init drawable)
-                                      (fn [_])) drawable)
+                         :setup (partial (or (:init drawable)
+                                             (fn [_])) drawable)
                          :draw (fn []
                                  ;(q/background 255 255 255)
                                  (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
@@ -163,4 +161,3 @@ use :init for setup in graphics environment.
              [(:min-border-w this)
               (:min-border-h this)]))
      [w h])))
-
