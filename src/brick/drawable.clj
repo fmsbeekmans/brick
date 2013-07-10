@@ -36,11 +36,11 @@ into n pieces."
   (draw [this [w h]]
     (q/image (:img this) 0 0 w h)))
 
-(defrecord Alpha [target-drawable alpha]
+(defrecord Tint [target-drawable tint]
   Drawable
   (draw [this [w h]]
     (q/push-style)
-    (q/tint 255 (:alpha this))
+    (apply q/tint (:tint this))
     (.draw ^brick.drawable.Drawable (:target-drawable this) [w h])
     (q/pop-style)))
 
