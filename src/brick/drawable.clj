@@ -36,6 +36,14 @@ into n pieces."
   (draw [this [w h]]
     (q/image (:img this) 0 0 w h)))
 
+(defrecord Alpha [target-drawable alpha]
+  Drawable
+  (draw [this [w h]]
+    (q/push-style)
+    (q/tint 255 (:alpha this))
+    (.draw ^brick.drawable.Drawable (:target-drawable this) [w h])
+    (q/pop-style)))
+
 (defn *-pi "take a number, multiply it by pi."
   [n]
   (* Math/PI n))
