@@ -89,15 +89,31 @@ into n pieces."
   Drawable
   (draw [_ _]))
 
+(defn sync-drop [atom-queue remove-queue]
+  (vec (drop
+        (loop [q1 atom-queue
+               q2 remove-queue
+               c 0]
+          (if (and (seq q1)
+                   (seq q2)
+                   (= (first q1)
+                      (first q2)))
+            (recur (rest q1)
+                   (rest q2)
+                   (inc c))
+            c))
+        atom-queue)))
+
 (defrecord Bricklet
     [target-drawable command-queue]
   #^{:doc "A special stacklayer."}
   Drawable
   (draw [this [w h]]
     (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])
-    (doseq [command @command-queue]
-      (command this))
-    (reset! command-queue [])))
+    (let [commands @command-queue]
+      (doseq [command commands]
+        (command this))
+      (swap! command-queue sync-drop commands))))
 
 (defn ->Bricklet
   "Create a new bricklet with layers, exec-queue and opts.
