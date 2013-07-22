@@ -111,9 +111,9 @@ into n pieces."
   (draw [this [w h]]
     (.draw ^brick.drawable.Drawable @(:target-drawable this) [w h])
     (let [commands @command-queue]
+      (reset! command-queue [])
       (doseq [command commands]
-        (command this))
-      (swap! command-queue sync-drop commands))))
+        (command this)))))
 
 (defn ->Bricklet
   "Create a new bricklet with layers, exec-queue and opts.
@@ -185,3 +185,19 @@ use :init for setup in graphics environment.
              [(:min-border-w this)
               (:min-border-h this)]))
      [w h])))
+
+(defprotocol Togglable
+  "Anything that can be drawn"
+  (toggle [this]
+    "Toggle the state of this."))
+
+(defrecord Toggle
+  [target state]
+  Drawable
+  (draw [this [w h]]
+    (if @(:state this)
+      (.draw (:target this) [w h])))
+  Togglable
+  (toggle [this]
+    (swap! (:state this) not)))
+
