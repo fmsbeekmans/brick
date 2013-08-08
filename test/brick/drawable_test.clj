@@ -214,3 +214,25 @@
 
 (fact "drawable? on a drawable returns true."
   (d/drawable? (d/->Nothing)) => TRUTHY)
+
+(defrecord CheckSize
+  [expected-size]
+  d/Drawable
+  (draw [this [w h]]
+    (fact [w h] => (:expected-size this))))
+
+(fact "Border encapsulates it's target"
+  (with-redefs [quil.core/width (fn [] 100)
+                quil.core/height (fn [] 100)
+                quil.core/push-matrix (fn [])
+                quil.core/pop-matrix (fn [])
+                quil.core/translate (fn [_])
+                quil.core/sketch (fn [& args]
+                                   (let [arg-map (named-args args)]
+                                     ((:draw arg-map))))]
+    (let [small-square (->CheckSize [70 70])
+          full-square (->CheckSize [100 100])
+          target-bar (->CheckSize [80 26])]
+      (d/.draw (d/->Border small-square 0.15 0.15) [100 100])
+      (d/.draw (d/->Border full-square 0 0) [100 100])
+      (d/.draw (d/->Border target-bar 0.1 0.375) [100 100]))))
