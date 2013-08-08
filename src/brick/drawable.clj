@@ -3,8 +3,6 @@
   (:use [brick.util :only [with-scale]])
   (:require [quil.core :as q]))
 
-(def min-borders [0.1 0.1])
-
 (defn ranges
   "Return a list of [offset size] so that pixels is divided
 into n pieces."
@@ -130,6 +128,7 @@ use :init for setup in graphics environment.
     (apply (partial assoc br) (apply concat (merge params opts-map br)))))
 
 (defrecord DerefMiddleware
+    #^{:doc "Draws the derefed target"}
   [target-drawable]
   Drawable
   (draw [this [w h]]
@@ -147,6 +146,7 @@ use :init for setup in graphics environment.
                                  (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
 
 (defrecord Border
+    #^{:doc "Draws it's target with margin."}
   [target border-w border-h]
   Drawable
   (draw
@@ -159,6 +159,8 @@ use :init for setup in graphics environment.
         (.draw ^brick.drawable.Drawable (:target this) [w' h'])))))
 
 (defn square-borders-size
+  "Calculates the border sizes such that an area of roughly w:h
+remains with a possible min-border size."
   ([[screen-w screen-h] [w h]]
      (square-borders-size [screen-w screen-h] [w h] [0 0]))
   ([[screen-w screen-h] [w h] [min-border-w min-border-h]]
@@ -173,6 +175,7 @@ use :init for setup in graphics environment.
            screen-h)])))
 
 (defrecord SquareTiledGrid
+    #^{:doc "A grid that will be drawn with square tiles with a margin around it of at least min-border/2."}
   [w h grid min-border-w min-border-h]
   Drawable
   (draw [this [w h]]
@@ -187,11 +190,12 @@ use :init for setup in graphics environment.
      [w h])))
 
 (defprotocol Togglable
-  "Anything that can be drawn"
+  "Anything that can be toggled"
   (toggle [this]
     "Toggle the state of this."))
 
 (defrecord Toggle
+    #^{:doc "Draws it's target if the toggle is on."}
   [target state]
   Drawable
   (draw [this [w h]]
