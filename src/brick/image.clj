@@ -12,7 +12,8 @@ them in a vector."
         indexed-tiles
         (for [i (take n-tiles
                       (iterate (partial + tile-w) 0))]
-          (Image. (.get ^processing.core.PImage source-image i 0 tile-w tile-h)))]
+          (Image.
+           (.get ^processing.core.PImage source-image i 0 tile-w tile-h)))]
     (vec indexed-tiles)))
 
 (defmacro in-draw-context

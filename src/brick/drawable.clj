@@ -143,7 +143,9 @@ use :init for setup in graphics environment.
                                              (fn [_])) drawable)
                          :draw (fn []
                                  ;(q/background 255 255 255)
-                                 (.draw ^brick.drawable.Drawable drawable [(q/width) (q/height)]))))))
+                                 (.draw ^brick.drawable.Drawable
+                                        drawable
+                                        [(q/width) (q/height)]))))))
 
 (defrecord Border
     #^{:doc "Draws it's target with margin."}
