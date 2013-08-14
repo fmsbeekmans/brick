@@ -25,7 +25,6 @@
                                    (let [arg-map (named-args args)]
                                      ((:draw arg-map))))]
     (let [dbg (d/simple-dbg)]
-      
       (fact "add-line, line gets "
             (let [i (atom 0)
                   up (fn []

@@ -177,7 +177,8 @@ remains with a possible min-border size."
            screen-h)])))
 
 (defrecord SquareTiledGrid
-    #^{:doc "A grid that will be drawn with square tiles with a margin around it of at least min-border/2."}
+    #^{:doc "A grid that will be drawn with square tiles with a margin around
+ it of at least min-border/2."}
   [w h grid min-border-w min-border-h]
   Drawable
   (draw [this [w h]]
@@ -206,4 +207,3 @@ remains with a possible min-border size."
   Togglable
   (toggle [this]
     (swap! (:state this) not)))
-
