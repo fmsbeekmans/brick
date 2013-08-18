@@ -14,4 +14,6 @@
                              [lein-cloverage "1.0.2"]]
                    :dependencies [[midje "1.5.0"]
                                   [org.clojars.runa/conjure "2.1.3"]]}}
+  :codox {:src-dir-uri "https://github.com/fmsbeekmans/brick/blob/master"
+          :src-linenum-anchor-prefix "L"}
   :aot [quil.applet])
