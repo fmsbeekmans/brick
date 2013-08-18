@@ -1,4 +1,4 @@
-(defproject jest/brick "0.1.1-SNAPSHOT"
+(defproject jest/brick "0.1.2"
   :description "Tiling engine built on Quil"
   :url "http://www.github.com/fmsbeekmans/brick.git"
   :license {:name "Eclipse Public License - v1.0"
